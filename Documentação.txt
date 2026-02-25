@@ -1,10 +1,17 @@
 Requisitos Funcionais
 
 Eduarda
-1 -
-2 -
-3 -
-4 -
+RF1 – Encerramento remoto de sessões ativas
+O sistema deve permitir que o usuário visualize todas as sessões ativas vinculadas à sua conta e possibilitar o encerramento remoto de sessões suspeitas ou não reconhecidas.
+
+RF2 – Bloqueio automático por tentativas inválidas
+O sistema deve bloquear temporariamente o acesso do usuário após um número configurável de tentativas de login inválidas, notificando o usuário sobre a tentativa de acesso suspeita.
+
+RF3 – Notificação de acesso a partir de novo dispositivo
+O sistema deve notificar o usuário sempre que sua conta for acessada a partir de um novo dispositivo ou localização não reconhecida.
+
+RF4 – Restauração de dados a partir de backup
+O sistema deve permitir a restauração dos dados de monitoramento do aquário a partir de backups previamente armazenados, mediante autenticação do usuário.
 
 Lucas
 5 -
@@ -29,10 +36,17 @@ O sistema deve solicitar a reautenticação do usuário em intervalos definidos,
 Requisitos Não Funcionais
 
 Eduarda
-1 -
-2 -
-3 -
-4 -
+RNF1 – Criptografia na transmissão de dados
+O sistema deverá garantir que todos os dados transmitidos entre dispositivos IoT, servidor e aplicativo mobile sejam protegidos por criptografia segura como por exemplo o TLS, prevenindo interceptação ou acesso não autorizado.
+
+RNF2 – Confidencialidade dos dados do usuário
+O sistema deverá assegurar que dados pessoais e informações de monitoramento sejam armazenados com mecanismos de proteção que impeçam acesso indevido.
+
+RNF3 – Sincronização segura de dados
+O sistema deverá garantir que a sincronização de dados entre dispositivos IoT, servidor e aplicativo mobile ocorra de forma consistente, evitando perda, duplicidade ou inconsistência das informações.
+
+RNF4 – Controle de acesso aos dados armazenados
+O sistema deverá garantir que o acesso aos dados armazenados no servidor seja restrito apenas a usuários e processos autorizados, por meio de políticas de controle de acesso e permissões adequadas.
 
 Lucas
 5 - 
