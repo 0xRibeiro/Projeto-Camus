@@ -13,10 +13,18 @@ Lucas
 8 -
 
 Victor
-9 -
-10 - 
-11 - 
-12 - 
+RF9 – Autenticação de dispositivos IoT
+O sistema deve permitir o cadastro e a autenticação de cada dispositivo IoT (sensores do aquário), utilizando um identificador único, garantindo que apenas dispositivos autorizados possam enviar dados ao sistema.
+
+RF10 – Notificação de eventos de segurança
+O sistema deve notificar o usuário, via aplicativo mobile ou email, sobre eventos suspeitos, como tentativa de conexão de dispositivo não autorizado ou falha recorrente de comunicação.
+
+RF11 – Detecção de comportamento anormal dos sensores
+O sistema deve identificar padrões anormais nos dados enviados pelos sensores que possam indicar falha, manipulação indevida ou comprometimento do dispositivo.
+
+RF12 – Reautenticação periódica do usuário
+O sistema deve solicitar a reautenticação do usuário em intervalos definidos, sem encerrar a sessão ativa, especialmente para garantir a identidade do usuário antes da execução de ações sensíveis.
+
 
 Requisitos Não Funcionais
 
@@ -33,7 +41,14 @@ Lucas
 8 -
 
 Victor
-9 -
-10 -
-11 -
-12 - 
+RNF9 – Manutenibilidade dos mecanismos de segurança
+O sistema permitirá a manutenção dos mecanismos de segurança por meio de configurações centralizadas e atualizações controladas, sem necessidade de paralisação completa do serviço.
+
+RNF10 – Integridade dos dados armazenados
+O sistema garantirá a integridade dos dados armazenados por meio de mecanismos de validação e verificação periódica, assegurando que informações de monitoramento não sejam alteradas indevidamente.
+
+RNF11 – Usabilidade com foco em segurança
+O sistema garantirá que os mecanismos de segurança sejam claros e compreensíveis ao usuário, utilizando mensagens e fluxos no aplicativo mobile que reduzam erros de uso e ações inseguras.
+
+RNF12 – Confiabilidade na identificação dos dispositivos IoT
+O sistema assegurará a identificação confiável dos dispositivos IoT por meio de identificadores únicos e processos de verificação antes da aceitação dos dados enviados.
