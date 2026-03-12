@@ -1,0 +1,1 @@
+// implementacao da interface de autenticacao
