@@ -1,5 +1,15 @@
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 
+
+
+
+
+
+
+
+
+// app de exemplo, comentado para consulta apenas:
+/*
 void main() {
   runApp(const MyApp());
 }
@@ -28,7 +38,9 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: const Color.fromARGB(81, 8, 189, 225)),
+        colorScheme: .fromSeed(
+          seedColor: const Color.fromARGB(81, 8, 189, 225),
+        ),
       ),
       home: const MyHomePage(title: 'Flutter Demo oooooooHome Page'),
     );
@@ -120,3 +132,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+*/
