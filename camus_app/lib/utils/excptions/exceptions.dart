@@ -12,6 +12,6 @@ abstract class AppException implements Exception {
     {
       return '$runtimeType: $message';
     }
-    ;
+    
   }
 }
