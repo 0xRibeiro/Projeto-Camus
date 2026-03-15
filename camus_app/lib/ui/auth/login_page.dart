@@ -1,10 +1,10 @@
+import 'package:camus_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:routefly/routefly.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
 import 'widgets/login_button.dart';
 import 'login_viewmodel.dart';
-import 'package:camus_app/ui/auth/register_page.dart';
-import 'package:camus_app/ui/home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -137,12 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () async {
                               bool success = await viewModel.login();
                               if (success && mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const HomePage(),
-                                  ),
-                                );
+                                Routefly.push(routePaths.auth.twoFactor);
                               }
                             },
                             isLoading: loading,
@@ -152,12 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 20),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterPage(),
-                            ),
-                          );
+                          Routefly.push(routePaths.auth.register);
                         },
                         child: Container(
                           width: 50,
@@ -191,12 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const RegisterPage(),
-                                ),
-                              );
+                              Routefly.push(routePaths.auth.register);
                             },
                             child: const Text(
                               'Cadastre-se!',

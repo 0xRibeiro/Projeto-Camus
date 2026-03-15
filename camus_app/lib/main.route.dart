@@ -3,10 +3,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:routefly/routefly.dart';
 
-import 'ui/auth/login_page.dart' as a0;
-import 'ui/home/home_page.dart' as a1;
+import 'ui/auth/login_page.dart' as a2;
+import 'ui/auth/register_page.dart' as a0;
+import 'ui/auth/two_factor_page.dart' as a1;
+import 'ui/home/home_page.dart' as a3;
 
 Route b0Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a0.LoginPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a0.RegisterPage());
 Route b1Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a1.HomePage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a1.TwoFactorPage());
+Route b2Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a2.LoginPage());
+Route b3Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a3.HomePage());
