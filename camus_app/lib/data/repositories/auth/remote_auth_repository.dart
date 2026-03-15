@@ -10,6 +10,7 @@ import 'package:camus_app/domain/entities/user_entity.dart';
 import 'package:camus_app/domain/validators/credentials_validator.dart';
 import 'package:camus_app/utils/validation/lucid_validator_extension.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:camus_app/domain/dtos/register_dto.dart';
 
 class RemoteAuthRepository implements AuthRepository {
   final _StreamController = StreamController<User>.broadcast();
@@ -17,6 +18,14 @@ class RemoteAuthRepository implements AuthRepository {
   final AuthClientHttp _authClientHttp;
 
   RemoteAuthRepository(this._authLocalStorage, this._authClientHttp);
+
+
+
+  @override
+AsyncResult<User> register(RegisterDTO registerDTO) {
+  return _authClientHttp.register(registerDTO);
+}
+
 
   @override
   AsyncResult<LoggedUser> login(Credentials credentials) {

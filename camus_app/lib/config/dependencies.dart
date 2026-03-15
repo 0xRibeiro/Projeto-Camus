@@ -6,6 +6,7 @@ import 'package:camus_app/data/services/auth/auth_local_storage.dart';
 import 'package:camus_app/data/services/auth/client_http.dart';
 import 'package:camus_app/data/services/local_storage.dart';
 import 'package:camus_app/ui/home/home_viewmodel.dart';
+import 'package:dio/dio.dart';
 
 final injector = AutoInjector();
 
@@ -24,6 +25,15 @@ void setupDependencies() {
   // viewmodels
   injector.addSingleton(HomeViewModel.new);
 
+
+  // http server
+  injector.addSingleton(
+  () => Dio(
+    BaseOptions(
+      baseUrl: "http://127.0.0.1:5000",
+    ),
+  ),
+);
 
 
 }
