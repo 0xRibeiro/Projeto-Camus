@@ -8,6 +8,11 @@ List<RouteEntity> get routes => [
     uri: Uri.parse('auth/login'),
     routeBuilder: b0Builder,
   ),
+  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b1Builder),
 ];
 
-const routePaths = (path: '/', auth: (path: '/auth', login: '/auth/login'));
+const routePaths = (
+  path: '/',
+  auth: (path: '/auth', login: '/auth/login'),
+  home: '/home',
+);
