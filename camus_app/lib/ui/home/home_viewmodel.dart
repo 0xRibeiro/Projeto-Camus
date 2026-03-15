@@ -9,15 +9,15 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void loadUser() {
-    user = const LoggedUser(
-      id: 1,
-      name: 'Test User',
-      email: 'test@email.com',
-      token: 'token',
-      refreshToken: 'refresh',
-    );
-    notifyListeners();
-  }
+  user = const LoggedUser(
+    id: 1,
+    name: 'Usuário de teste',
+    email: 'teste@email.com',
+    token: 'token',
+    refreshToken: 'refresh-token',
+  );
+  notifyListeners();
+}
 
   Future<void> logout() async {
     user = null;
