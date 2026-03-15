@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
+import 'widgets/repeat_password_field.dart';
+import 'widgets/username_field.dart';
 import 'widgets/login_button.dart';
-import 'login_viewmodel.dart';
-import 'package:camus_app/ui/auth/register_page.dart';
+import 'register_viewmodel.dart';
+import 'package:camus_app/ui/auth/login_page.dart';
 import 'package:camus_app/ui/home/home_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final LoginViewModel viewModel = LoginViewModel();
+class _RegisterPageState extends State<RegisterPage> {
+  final RegisterViewModel viewModel = RegisterViewModel();
+
   bool obscurePassword = true;
+  bool obscureRepeatPassword = true;
 
   void togglePasswordVisibility() {
     setState(() {
       obscurePassword = !obscurePassword;
+    });
+  }
+
+  void toggleRepeatPasswordVisibility() {
+    setState(() {
+      obscureRepeatPassword = !obscureRepeatPassword;
     });
   }
 
@@ -39,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             const SizedBox(height: 40),
             const Text(
-              'Log In',
+              'Register',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -70,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Entre para ver o seu aquário!',
+              'Crie sua conta para acessar o aquário!',
               style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
             ),
             const SizedBox(height: 32),
@@ -97,6 +107,11 @@ class _LoginPageState extends State<LoginPage> {
                         builder: (context, errorText, _) {
                           return Column(
                             children: [
+                              UsernameField(
+                                controller: viewModel.usernameController,
+                                errorText: errorText,
+                              ),
+                              const SizedBox(height: 16),
                               EmailField(
                                 controller: viewModel.emailController,
                                 errorText: errorText,
@@ -108,34 +123,27 @@ class _LoginPageState extends State<LoginPage> {
                                 onToggleVisibility: togglePasswordVisibility,
                                 errorText: errorText,
                               ),
+                              const SizedBox(height: 16),
+                              RepeatPasswordField(
+                                controller: viewModel.repeatPasswordController,
+                                obscureText: obscureRepeatPassword,
+                                onToggleVisibility:
+                                    toggleRepeatPasswordVisibility,
+                                errorText: errorText,
+                              ),
                             ],
                           );
                         },
                       ),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.center,
-                        child: TextButton(
-                          onPressed: () {
-                            // aqui navegar para esqueci senha
-                          },
-                          child: const Text(
-                            'Esqueci minha senha',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       ValueListenableBuilder<bool>(
                         valueListenable: viewModel.isLoading,
                         builder: (context, loading, _) {
                           return LoginButton(
-                            text: 'Entrar',
+                            text: 'Cadastrar',
+                            isLoading: loading,
                             onPressed: () async {
-                              bool success = await viewModel.login();
+                              final bool success = await viewModel.register();
                               if (success && mounted) {
                                 Navigator.pushReplacement(
                                   context,
@@ -145,45 +153,15 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                               }
                             },
-                            isLoading: loading,
                           );
                         },
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterPage(),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              'G',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            'Não possui conta? ',
+                            'Já possui conta? ',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 14,
@@ -191,15 +169,15 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const RegisterPage(),
+                                  builder: (_) => const LoginPage(),
                                 ),
                               );
                             },
                             child: const Text(
-                              'Cadastre-se!',
+                              'Entrar!',
                               style: TextStyle(
                                 color: Color(0xFFFF9800),
                                 fontSize: 14,
