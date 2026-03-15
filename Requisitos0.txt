@@ -1,0 +1,108 @@
+REQUISITOS DO SISTEMA.
+
+	•	REQUISITOS FUNCIONAIS
+
+RF1 – Encerramento remoto de sessões ativas:
+O sistema deve permitir que o usuário visualize todas as sessões ativas 
+vinculadas à sua conta e possibilitar o encerramento remoto de sessões 
+suspeitas ou não reconhecidas.
+
+RF2 – Bloqueio automático por tentativas inválidas:
+O sistema deve bloquear temporariamente o acesso do usuário após um número 
+configurável de tentativas de login inválidas, notificando o usuário 
+sobre a tentativa de acesso suspeita.
+
+RF3 – Notificação de acesso a partir de novo dispositivo:
+O sistema deve notificar o usuário sempre que sua conta for acessada a partir de um 
+novo dispositivo ou localização não reconhecida.
+
+RF4 – Restauração de dados a partir de backup:
+O sistema deve permitir a restauração dos dados de monitoramento do aquário a partir 
+de backups previamente armazenados, mediante autenticação do usuário.
+
+RF5 – Notificação de tentativas de login não autorizadas
+Sempre que houver uma tentativa de login falha, o sistema deve notificar o usuário via 
+email ou mensagem no app, para verificar se houve acesso indevido à sua conta.
+
+RF6 – Registro de auditoria e monitoramento de ações críticas
+O sistema deve registrar todas as ações importantes, como alterações nos parâmetros do 
+aquário (temperatura, pH), para garantir rastreabilidade e facilitar a investigação 
+em caso de anomalias.
+
+RF7 – Ação de emergência para desativar dispositivos
+O sistema deve permitir que o usuário possa desativar remotamente todos os dispositivos do 
+aquário (como aquecedor, filtro, alimentação, etc.) em caso de emergência, para evitar 
+danos ao sistema ou aos peixes.
+
+RF8 – Controle de acesso por autenticação de múltiplos dispositivos
+O sistema deve permitir que o usuário acesse e controle os parâmetros do aquário de qualquer 
+dispositivo, mantendo a autenticação segura.
+
+RF9 – Autenticação de dispositivos IoT:
+O sistema deve permitir o cadastro e a autenticação de cada dispositivo IoT (sensores do aquário), 
+utilizando um identificador único, garantindo que apenas dispositivos autorizados possam enviar 
+dados ao sistema.
+
+RF10 – Notificação de eventos de segurança:
+O sistema deve notificar o usuário, via aplicativo mobile ou email, sobre eventos suspeitos, como 
+tentativa de conexão de dispositivo não autorizado ou falha recorrente de comunicação.
+
+RF11 – Detecção de comportamento anormal dos sensores:
+O sistema deve identificar padrões anormais nos dados enviados pelos sensores que possam indicar falha, 
+manipulação indevida ou comprometimento do dispositivo.
+
+RF12 – Reautenticação periódica do usuário:
+O sistema deve solicitar a reautenticação do usuário em intervalos definidos, sem encerrar a sessão ativa, 
+especialmente para garantir a identidade do usuário antes da execução de ações sensíveis.
+
+	•	REQUISITOS NÃO FUNCIONAIS 
+
+RNF1 – Criptografia na transmissão de dados
+O sistema deverá garantir que todos os dados transmitidos entre dispositivos IoT, servidor e aplicativo 
+mobile sejam protegidos por criptografia segura como por exemplo o TLS, prevenindo interceptação ou acesso 
+não autorizado.
+
+RNF2 – Confidencialidade dos dados do usuário
+O sistema deverá assegurar que dados pessoais e informações de monitoramento sejam armazenados com mecanismos 
+de proteção que impeçam acesso indevido.
+
+RNF3 – Sincronização segura de dados
+O sistema deverá garantir que a sincronização de dados entre dispositivos IoT, servidor e aplicativo mobile 
+ocorra de forma consistente, evitando perda, duplicidade ou inconsistência das informações.
+
+RNF4 – Controle de acesso aos dados armazenados
+O sistema deverá garantir que o acesso aos dados armazenados no servidor seja restrito apenas a usuários
+e processos autorizados, por meio de políticas de controle de acesso e permissões adequadas.
+
+RNF5 – Proteção contra ataques de força bruta
+O sistema deve ser projetado para prevenir ataques de força bruta no processo de login,
+bloqueando a conta por um período determinado após um número excessivo de tentativas inválidas de login.
+
+RNF6 – Comunicação segura entre dispositivos
+A comunicação entre os dispositivos ESP32 e o app (ou interface web) deve ser realizada
+através de protocolos seguros, como HTTPS, garantindo que todos os dados transmitidos sejam criptografados.
+
+RNF7 – Backup e recuperação de dados automáticos
+O sistema deve realizar backups automáticos regulares dos dados do aquário, permitindo a
+recuperação rápida desses dados em caso de falhas no sistema.
+
+RNF8 – Testes contínuos de segurança e vulnerabilidades
+O sistema deve ser regularmente submetido a testes de segurança e auditorias de vulnerabilidades,
+para garantir que falhas de segurança sejam identificadas e corrigidas de forma contínua, mantendo
+o sistema sempre seguro contra novas ameaças.
+
+RNF9 – Manutenibilidade dos mecanismos de segurança
+O sistema permitirá a manutenção dos mecanismos de segurança por meio de configurações centralizadas
+e atualizações controladas, sem necessidade de paralisação completa do serviço.
+
+RNF10 – Integridade dos dados armazenados
+O sistema garantirá a integridade dos dados armazenados por meio de mecanismos de validação e verificação
+periódica, assegurando que informações de monitoramento não sejam alteradas indevidamente.
+
+RNF11 – Usabilidade com foco em segurança
+O sistema garantirá que os mecanismos de segurança sejam claros e compreensíveis ao usuário, utilizando
+mensagens e fluxos no aplicativo mobile que reduzam erros de uso e ações inseguras.
+
+RNF12 – Confiabilidade na identificação dos dispositivos IoT
+O sistema assegurará a identificação confiável dos dispositivos IoT por meio de identificadores únicos
+e processos de verificação antes da aceitação dos dados enviados.
