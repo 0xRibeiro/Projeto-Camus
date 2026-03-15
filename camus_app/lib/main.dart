@@ -20,8 +20,7 @@ class CamusApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: Routefly.routerConfig(
         routes: routes,
-        initialPath: routePaths.home
-        
+        initialPath: '/auth/login'
         ),
     );
   }
