@@ -3,6 +3,7 @@ import 'package:camus_app/config/dependencies.dart';
 import 'package:camus_app/ui/home/home_viewmodel.dart';
 import 'widgets/logout_button.dart';
 import 'widgets/user_card.dart';
+import 'package:camus_app/ui/auth/login_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,9 +37,7 @@ class _HomePageState extends State<HomePage> {
     final user = viewModel.user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
+      appBar: AppBar(title: const Text('Home')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -48,6 +47,13 @@ class _HomePageState extends State<HomePage> {
             LogoutButton(
               onPressed: () async {
                 await viewModel.logout();
+
+                if (!mounted) return;
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
               },
             ),
           ],
