@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:camus_app/config/dependencies.dart';
+import 'package:camus_app/data/repositories/auth/auth_repository.dart';
+import 'package:camus_app/domain/dtos/register_dto.dart';
 
 class RegisterViewModel {
+  final AuthRepository _authRepository = injector.get<AuthRepository>();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController repeatPasswordController = TextEditingController();
+  final TextEditingController repeatPasswordController =
+      TextEditingController();
 
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<String?> errorMessage = ValueNotifier(null);
@@ -47,8 +52,21 @@ class RegisterViewModel {
       return false;
     }
 
-    isLoading.value = false;
-    return true;
+    final dto = RegisterDTO(nome: username, email: email, senha: password);
+
+    final result = await _authRepository.register(dto);
+
+    return result.fold(
+      (user) {
+        isLoading.value = false;
+        return true;
+      },
+      (error) {
+        errorMessage.value = 'Erro ao cadastrar usuário';
+        isLoading.value = false;
+        return false;
+      },
+    );
   }
 
   void dispose() {
