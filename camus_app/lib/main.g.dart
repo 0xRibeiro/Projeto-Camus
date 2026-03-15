@@ -4,15 +4,30 @@ part of 'main.dart';
 
 List<RouteEntity> get routes => [
   RouteEntity(
-    key: 'auth/login',
-    uri: Uri.parse('auth/login'),
+    key: 'auth/register',
+    uri: Uri.parse('auth/register'),
     routeBuilder: b0Builder,
   ),
-  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b1Builder),
+  RouteEntity(
+    key: 'auth/two_factor',
+    uri: Uri.parse('auth/two_factor'),
+    routeBuilder: b1Builder,
+  ),
+  RouteEntity(
+    key: 'auth/login',
+    uri: Uri.parse('auth/login'),
+    routeBuilder: b2Builder,
+  ),
+  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b3Builder),
 ];
 
 const routePaths = (
   path: '/',
-  auth: (path: '/auth', login: '/auth/login'),
+  auth: (
+    path: '/auth',
+    register: '/auth/register',
+    twoFactor: '/auth/two_factor',
+    login: '/auth/login',
+  ),
   home: '/home',
 );
