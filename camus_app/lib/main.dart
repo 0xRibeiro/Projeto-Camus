@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:camus_app/config/dependencies.dart';
-import 'package:flutter/widgets.dart';
 import 'package:routefly/routefly.dart';
 
 import 'main.route.dart';

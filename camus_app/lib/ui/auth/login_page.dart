@@ -135,9 +135,12 @@ class _LoginPageState extends State<LoginPage> {
                           return LoginButton(
                             text: 'Entrar',
                             onPressed: () async {
-                              bool success = await viewModel.login();
-                              if (success && mounted) {
-                                Routefly.push(routePaths.auth.twoFactor);
+                              final challengeId = await viewModel.login();
+                              if (challengeId != null && mounted) {
+                                Routefly.push(
+                                  routePaths.auth.twoFactor,
+                                  arguments: {"challengeId": challengeId},
+                                );
                               }
                             },
                             isLoading: loading,

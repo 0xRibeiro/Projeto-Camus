@@ -5,10 +5,11 @@ import 'dart:async';
 import 'package:camus_app/data/repositories/auth/auth_repository.dart';
 import 'package:camus_app/data/services/auth/auth_client_http.dart';
 import 'package:camus_app/data/services/auth/auth_local_storage.dart';
+import 'package:camus_app/domain/dtos/auth_challenge.dart';
 import 'package:camus_app/domain/dtos/credentials.dart';
+import 'package:camus_app/domain/dtos/verify_code_dto.dart';
+import 'package:camus_app/domain/dtos/verify_code_response.dart';
 import 'package:camus_app/domain/entities/user_entity.dart';
-import 'package:camus_app/domain/validators/credentials_validator.dart';
-import 'package:camus_app/utils/validation/lucid_validator_extension.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:camus_app/domain/dtos/register_dto.dart';
 
@@ -19,22 +20,18 @@ class RemoteAuthRepository implements AuthRepository {
 
   RemoteAuthRepository(this._authLocalStorage, this._authClientHttp);
 
-
+  @override
+  AsyncResult<AuthChallenge> register(RegisterDTO registerDTO) {
+    return _authClientHttp.register(registerDTO);
+  }
 
   @override
-AsyncResult<User> register(RegisterDTO registerDTO) {
-  return _authClientHttp.register(registerDTO);
-}
+  AsyncResult<AuthChallenge> login(Credentials credentials) {
+    return _authClientHttp.login(credentials);
+  }
 
-
-  @override
-  AsyncResult<LoggedUser> login(Credentials credentials) {
-    final validator = CredentialsValidator();
-    return validator//
-      .validateResult(credentials)
-      .flatMap(_authClientHttp.login)
-      .flatMap(_authLocalStorage.saveUser)
-      .onSuccess(_StreamController.add);
+  AsyncResult<VerifyCodeResponse> verifyCode(VerifyCodeDTO dto) {
+    return _authClientHttp.verifyCode(dto);
   }
 
   @override

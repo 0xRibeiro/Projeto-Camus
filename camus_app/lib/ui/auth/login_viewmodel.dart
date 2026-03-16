@@ -1,4 +1,8 @@
+import 'package:camus_app/config/dependencies.dart';
+import 'package:camus_app/data/repositories/auth/auth_repository.dart';
+import 'package:camus_app/domain/dtos/credentials.dart';
 import 'package:flutter/material.dart';
+import 'package:camus_app/config/session.dart';
 
 class LoginViewModel {
   final TextEditingController emailController = TextEditingController();
@@ -6,25 +10,26 @@ class LoginViewModel {
 
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<String?> errorMessage = ValueNotifier(null);
+  final AuthRepository _authRepository = injector.get<AuthRepository>();
 
   /// Simula login (substituir por chamada real à API)
-  Future<bool> login() async {
+  Future<int?> login() async {
     isLoading.value = true;
     errorMessage.value = null;
 
-    await Future.delayed(const Duration(seconds: 2)); // simula requisição
+    final credentials = Credentials(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
-
-    bool success = email == 'teste@email.com' && password == '123456';
-
-    if (!success) {
-      errorMessage.value = 'E-mail ou senha inválidos';
-    }
+    final result = await _authRepository.login(credentials);
 
     isLoading.value = false;
-    return success;
+
+    return result.fold((success) => success.challengeId, (error) {
+      errorMessage.value = "Login inválido";
+      return null;
+    });
   }
 
   void dispose() {
