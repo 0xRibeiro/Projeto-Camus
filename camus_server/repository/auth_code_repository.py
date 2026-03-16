@@ -29,6 +29,7 @@ class AuthCodeRepository:
 
         return auth_code
 
+    # 1.6 Busca apenas códigos válidos, não usados e não expirados
     def buscar_valido(self, challenge_id, codigo):
 
         with self.conexao.cursor(dictionary=True) as cursor:

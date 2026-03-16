@@ -6,6 +6,7 @@ class SessionRepository:
     def __init__(self, conexao):
         self.conexao = conexao
 
+    # 1.9 Persistência da sessão autenticada no banco
     def criar(self, sessao: Session) -> Session:
         with self.conexao.cursor() as cursor:
             cursor.execute(
@@ -24,6 +25,7 @@ class SessionRepository:
             sessao.id = cursor.lastrowid
         return sessao
 
+    # 1.9 Sessão válida precisa estar ativa e dentro do prazo
     def buscar_ativa_por_jti(self, token_jti: str):
         with self.conexao.cursor(dictionary=True) as cursor:
             cursor.execute(
@@ -38,6 +40,7 @@ class SessionRepository:
             )
             return cursor.fetchone()
 
+    # 1.10 Sessão invalidada manualmente no logout
     def invalidar_por_jti(self, token_jti: str):
         with self.conexao.cursor() as cursor:
             cursor.execute(

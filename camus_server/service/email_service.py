@@ -18,6 +18,7 @@ def enviar_codigo(email_destino, codigo):
     mensagem["To"] = email_destino
     mensagem["Subject"] = "Seu codigo de verificacao"
 
+    # 1.5 Envio do código 2FA por email
     corpo = f"""
 Seu codigo de verificacao é:
 

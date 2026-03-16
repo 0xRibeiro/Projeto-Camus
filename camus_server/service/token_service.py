@@ -24,6 +24,7 @@ def gerar_token(user_id: int):
         "exp": expira_em,
     }
 
+    # 1.9 Token com expiração configurada
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     return {

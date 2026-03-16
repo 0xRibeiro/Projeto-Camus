@@ -7,6 +7,7 @@ class RepositorioUsuario:
 
     def cadastrar(self, usuario: Usuario) -> Usuario:
         with self.conexao.cursor() as cursor:
+            # 1.4 Armazenamento do hash já gerado da senha
             cursor.execute(
                 "INSERT INTO users (nome, email, senha) VALUES (%s, %s, %s)",
                 (usuario.nome, usuario.email, usuario.senha),
