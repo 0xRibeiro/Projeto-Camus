@@ -27,6 +27,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# 1.11 Proteção contra força bruta implementada com rate limit por IP
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
@@ -84,6 +85,7 @@ def preparar_banco():
         conexao.close()
 
 
+# Extrai o token Bearer do header Authorization
 def extrair_bearer_token():
     auth_header = request.headers.get("Authorization", "")
 
@@ -93,6 +95,8 @@ def extrair_bearer_token():
     return auth_header.removeprefix("Bearer ").strip()
 
 
+# 1.9 Validação de sessão ativa e não expirada
+# 1.10 Validação de sessão não invalidada no logout
 def autenticar_requisicao(conexao):
     token = extrair_bearer_token()
 
@@ -132,6 +136,7 @@ def autenticar_requisicao(conexao):
 
 
 @app.post("/cadastrar")
+# 1.11 Limite de tentativas no cadastro
 @limiter.limit("5 per minute")
 def cadastrar_usuario():
 
@@ -149,6 +154,9 @@ def cadastrar_usuario():
 
     try:
 
+        # 1.1 Uso de hash criptográfico seguro para senhas
+        # 1.3 Salt único por usuário é gerado automaticamente pelo bcrypt
+        # 1.4 O valor salvo já contém hash + salt embutidos
         senha_hash = gerar_hash_senha(dados["senha"])
 
         usuario = Usuario(
@@ -160,6 +168,7 @@ def cadastrar_usuario():
         repositorio_usuario = RepositorioUsuario(conexao)
         usuario = repositorio_usuario.cadastrar(usuario)
 
+        # 1.5 Autenticação de dois fatores implementada
         codigo = str(random.randint(100000, 999999))
         expira = datetime.now() + timedelta(minutes=10)
 
@@ -192,6 +201,7 @@ def cadastrar_usuario():
 
 
 @app.post("/login")
+# 1.11 Limite de tentativas no login
 @limiter.limit("5 per minute")
 def login():
 
@@ -216,10 +226,12 @@ def login():
             app.logger.warning("login_usuario_nao_encontrado")
             return jsonify({"error": "Usuario ou senha invalidos"}), 401
 
+        # 1.1 Validação do hash seguro da senha
         if not verificar_senha(dados["senha"], usuario.senha):
             app.logger.warning("login_senha_invalida")
             return jsonify({"error": "Usuario ou senha invalidos"}), 401
 
+        # 1.5 Geração do código 2FA após autenticação primária
         codigo = str(random.randint(100000, 999999))
         expira = datetime.now() + timedelta(minutes=10)
 
@@ -252,6 +264,7 @@ def login():
 
 
 @app.post("/verificar-codigo")
+# 1.11 Limite de tentativas no 2FA
 @limiter.limit("10 per minute")
 def verificar_codigo():
 
@@ -275,6 +288,7 @@ def verificar_codigo():
         repo_codigo = AuthCodeRepository(conexao)
         resultado = repo_codigo.buscar_valido(challenge_id, codigo)
 
+        # 1.6 Validação do 2FA após autenticação primária
         if not resultado:
             app.logger.warning("verificar_codigo_invalido_ou_expirado")
             return jsonify({"error": "Codigo invalido ou expirado"}), 400
@@ -288,6 +302,7 @@ def verificar_codigo():
             app.logger.warning("verificar_codigo_usuario_nao_encontrado")
             return jsonify({"error": "Usuario nao encontrado"}), 404
 
+        # 1.9 Criação de sessão com tempo de expiração via JWT
         token_data = gerar_token(usuario.id)
 
         repo_sessao = SessionRepository(conexao)
@@ -362,6 +377,7 @@ def logout():
         if erro:
             return erro
 
+        # 1.10 Invalidação de sessão no logout
         repo_sessao = SessionRepository(conexao)
         repo_sessao.invalidar_por_jti(auth["token_jti"])
 
@@ -410,4 +426,5 @@ if __name__ == "__main__":
     if not preparar_banco():
         raise RuntimeError("Nao foi possivel inicializar o banco MySQL")
 
+    # 1.8 Evidência funcional: execução local do servidor com logs
     app.run(debug=True)
