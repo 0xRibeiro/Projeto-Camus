@@ -2,7 +2,6 @@ import 'package:camus_app/config/dependencies.dart';
 import 'package:camus_app/data/repositories/auth/auth_repository.dart';
 import 'package:camus_app/domain/dtos/verify_code_dto.dart';
 import 'package:flutter/material.dart';
-import 'package:camus_app/config/session.dart';
 import 'package:camus_app/ui/home/home_viewmodel.dart';
 
 class TwoFactorViewModel {

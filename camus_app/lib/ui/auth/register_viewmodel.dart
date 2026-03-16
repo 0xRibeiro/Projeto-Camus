@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:camus_app/config/dependencies.dart';
 import 'package:camus_app/data/repositories/auth/auth_repository.dart';
 import 'package:camus_app/domain/dtos/register_dto.dart';
-import 'package:camus_app/config/session.dart';
 
 class RegisterViewModel {
   final AuthRepository _authRepository = injector.get<AuthRepository>();
