@@ -1,101 +1,167 @@
-
-  FLUXO DE AUTENTICACAO — CAMUS SERVER
+FLUXO DE AUTENTICACAO — CAMUS SERVER
 
 
 1. CADASTRO  (POST /cadastrar)
 
 
 Cliente envia:
-  {
-    "nome":  "exemplo",
-    "email": "exemplo@email.com",
-    "senha": "minhasenha123"
-  }
+{
+  "nome":  "exemplo",
+  "email": "exemplo@email.com",
+  "senha": "minhasenha123"
+}
 
 Servidor:
-  1. Valida que nome, email e senha estao presentes.
-  2. Verifica se o e-mail ja existe no banco (é um campo UNIQUE).
-  3. Gera hash da senha com bcrypt (custo 12).
-  4. Salva { nome, email, senha_hash } na tabela users.
-  5. Retorna:
 
-  HTTP 201
-  {
-    "id":    1,
-    "nome":  "exemplo",
-    "email": "exemplo@email.com"
-  }
+  1. Valida que nome, email e senha estao presentes.
+  2. Verifica se o e-mail ja existe no banco (campo UNIQUE).
+  3. Gera hash da senha usando bcrypt (custo 12).
+  4. Salva { nome, email, senha_hash } na tabela users.
+  5. Gera um codigo de verificacao de 6 digitos.
+  6. Salva o codigo na tabela auth_codes com validade de 10 minutos.
+  7. Envia o codigo para o e-mail cadastrado.
+  8. Retorna:
+
+HTTP 201
+
+{
+  "requires_2fa": true,
+  "challenge_id": 1,
+  "message": "Codigo enviado para o email"
+}
+
 
 Erros possiveis:
-  400 — campo obrigatorio ausente
-  409 — e-mail ja cadastrado
-  429 - Muitas requisicões (Too many requests) = Usado para evitar brute force.
-  500 — falha interna
+
+400 — campo obrigatorio ausente  
+409 — e-mail ja cadastrado  
+429 — muitas requisicoes (rate limit)  
+500 — falha interna
+
+
 
 2. LOGIN  (POST /login)
 
 Cliente envia:
-  {
-    "email":    "exemplo@email.com",
-    "password": "minhasenha123"
-  }
+
+{
+  "email": "exemplo@email.com",
+  "senha": "minhasenha123"
+}
 
 Servidor:
+
   1. Busca o usuario pelo e-mail na tabela users.
   2. Compara a senha enviada com o hash armazenado.
   3. Se invalido, retorna 401.
-  4. Gera access token (expira em 15 min)
-  5. Gera refresh token (expira em 7 dias):
-  6. Retorna:
+  4. Gera um codigo de verificacao de 6 digitos.
+  5. Salva o codigo na tabela auth_codes com validade de 10 minutos.
+  6. Envia o codigo para o e-mail cadastrado.
+  7. Retorna:
 
-  HTTP 200
-  {
-    "id":           1,
-    "name":         "exemplo",
-    "email":        "exemplo@email.com",
-    "token":        "<access_token>",
-    "refreshToken": "<refresh_token>"
-  }
+HTTP 200
+
+{
+  "requires_2fa": true,
+  "challenge_id": 5,
+  "message": "Codigo enviado para o email"
+}
 
 
 Erros possiveis:
-  400 — campo obrigatorio ausente
-  401 — credenciais invalidas
-  500 — falha interna
+
+400 — campo obrigatorio ausente  
+401 — credenciais invalidas  
+429 — muitas requisicoes (rate limit)  
+500 — falha interna
 
 
-3. RENOVACAO DO TOKEN  (POST /refresh)
 
-Cliente envia (quando o access token expirar):
-  Header:  Authorization: Bearer <refresh_token>
+3. VERIFICACAO DO CODIGO 2FA  (POST /verificar-codigo)
+
+Cliente envia:
+
+{
+  "challenge_id": 5,
+  "codigo": "123456"
+}
 
 Servidor:
-  1. Decodifica e valida o refresh token.
-  2. Verifica que o usuario ainda existe no banco.
-  3. Gera novo access token (15 min).
+
+  1. Busca o codigo na tabela auth_codes.
+  2. Verifica se:
+       - o codigo corresponde
+       - nao foi utilizado
+       - nao expirou
+  3. Marca o codigo como usado.
+  4. Busca o usuario associado.
+  5. Gera um token JWT de autenticacao.
+  6. Cria uma sessao na tabela sessions.
+  7. Retorna:
+
+HTTP 200
+
+{
+  "ok": true,
+  "message": "Autenticacao concluida",
+  "token": "<jwt_token>",
+  "expires_at": "2026-03-23T13:25:54"
+}
+
+
+
+4. CONSULTA DO USUARIO AUTENTICADO  (GET /me)
+
+Cliente envia:
+
+Header:
+Authorization: Bearer <token>
+
+Servidor:
+
+  1. Valida assinatura do token JWT.
+  2. Verifica se a sessao existe na tabela sessions.
+  3. Verifica se a sessao nao foi invalidada.
+  4. Verifica se a sessao nao expirou.
+  5. Retorna os dados do usuario.
+
+HTTP 200
+
+{
+  "id": 1,
+  "nome": "exemplo",
+  "email": "exemplo@email.com"
+}
+
+
+
+5. LOGOUT  (POST /logout)
+
+Cliente envia:
+
+Header:
+Authorization: Bearer <token>
+
+Servidor:
+
+  1. Valida o token JWT.
+  2. Busca a sessao no banco pelo token_jti.
+  3. Marca a sessao como invalidada.
   4. Retorna:
 
-  HTTP 200
-  {
-    "token": "<novo_access_token>"
-  }
+HTTP 200
 
-Erros possiveis:
-  401 — refresh token invalido ou expirado
-
-
-5. LOGOUT
+{
+  "ok": true,
+  "message": "Sessao encerrada com sucesso"
+}
 
 
-O logout e tratado exclusivamente no Flutter:
-  - AuthLocalStorage.removeUser() apaga os tokens locais.
-  - O stream userObservable emite NotLoggedUser.
-  - O servidor não precisa de um endpoint de logout enquanto
-    nao houver blacklist de tokens.
 
-6. RESUMO DE ENDPOINTS DE AUTH
+6. RESUMO DOS ENDPOINTS DE AUTENTICACAO
 
-  POST /cadastrar   — cria conta
-  POST /login       — autentica e devolve tokens -----A FAZER
-  POST /refresh     — renova o access token ------- A FAZER
-
+POST /cadastrar
+POST /login
+POST /verificar-codigo
+POST /logout
+GET  /me
