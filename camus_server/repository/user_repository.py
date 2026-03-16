@@ -44,3 +44,24 @@ class RepositorioUsuario:
                 email=row[2],
                 senha=row[3],
             )
+            
+    def buscar_por_id(self, user_id: int) -> Usuario | None:
+
+     with self.conexao.cursor() as cursor:
+        
+         cursor.execute(
+             "SELECT id, nome, email, senha FROM users WHERE id = %s",
+             (user_id,),
+         )
+    
+         row = cursor.fetchone()
+    
+         if not row:
+             return None
+    
+         return Usuario(
+             id=row[0],
+             nome=row[1],
+             email=row[2],
+             senha=row[3],
+         )
