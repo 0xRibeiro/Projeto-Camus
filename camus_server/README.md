@@ -36,7 +36,7 @@ Como executar
 1. Garanta que o MySQL esteja ativo e que o banco `camus` exista.
 2. Instale dependencias:
 
-pip install flask mysql-connector-python
+pip install flask flask-limiter mysql-connector-python python-dotenv
 
 3. Rode a API:
 

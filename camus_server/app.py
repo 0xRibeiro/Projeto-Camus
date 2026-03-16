@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from database.db import criar_conexao, inicializar_banco
 from model.user import Usuario
@@ -20,7 +22,18 @@ load_dotenv()
 
 app = Flask(__name__)
 
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    storage_uri="memory://",
+)
+
 ERRO = {"error": "Erro interno ao processar a solicitacao"}
+
+
+@app.errorhandler(429)
+def tratar_rate_limit(_erro):
+    return jsonify({"error": "Muitas tentativas. Tente novamente em instantes"}), 429
 
 
 def configurar_logs():
@@ -67,6 +80,7 @@ def preparar_banco():
 
 
 @app.post("/cadastrar")
+@limiter.limit("5 per minute")
 def cadastrar_usuario():
 
     dados = request.get_json(silent=True) or {}
@@ -126,6 +140,7 @@ def cadastrar_usuario():
 
 
 @app.post("/login")
+@limiter.limit("5 per minute")
 def login():
 
     dados = request.get_json(silent=True) or {}
@@ -185,6 +200,7 @@ def login():
 
 
 @app.post("/verificar-codigo")
+@limiter.limit("10 per minute")
 def verificar_codigo():
 
     dados = request.get_json(silent=True) or {}
