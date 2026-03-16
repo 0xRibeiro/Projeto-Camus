@@ -1,0 +1,176 @@
+  JUSTIFICATIVAS TECNICAS — SEGURANCA DE AUTENTICACAO
+
+1. CRIPTOGRAFIA DE SENHAS — bcrypt
+
+As senhas dos usuarios nunca são armazenadas em texto puro.
+Antes de salvar no banco, a senha é processada com bcrypt,
+um algoritmo projetado especificamente para hashing de senhas.
+
+Bcrypt foi escolhido porque ele é próprio pra isso e possui salt
+automatica na geração de senha, facilitando muito essa parte do processo.
+
+Com ele, mesmo que o banco de dados seja comprometido,
+as senhas permanecem protegidas na pratica.
+
+Armazenamento do hash + salt
+
+  bcrypt retorna uma unica string de 60 caracteres que ja
+  contem embutidos o algoritmo, o fator de custo, o salt e
+  o hash. Exemplo de saida:
+
+    $2b$12$<salt><hash>
+
+  Isso significa que a coluna "senha" da tabela users guarda
+  tudo que e necessario para verificar a senha no futuro.
+  Não é preciso de uma coluna separada para o salt já que ele
+  nunca é armazenado sozinho e nunca é reutilizado.
+
+
+2. FLUXO DE AUTENTICACAO DOCUMENTADO
+
+O fluxo completo de autenticação com cadastro, login com 2FA,
+renovacão de token e logout  está descrito em detalhe no
+arquivo fluxo.txt, na mesma pasta deste documento.
+
+Resumo dos endpoints documentados até o momento:
+  POST /cadastrar        — criacao de conta
+  POST /login            — autentica e devolve tokens ----- A FAZER
+  POST /refresh          — renova o access token      ----- A FAZER
+
+
+3. AUTENTICACAO DE DOIS FATORES COM E-MAIL (2FA)
+
+Mesmo com uma senha forte, ela pode ser vazada por phishing,
+reutilização de senhas ou engenharia social. O segundo fator
+garante que conhecer a senha sozinha nao é suficiente para
+acessar a conta. No momento o 2FA está implementado apenas com E-mail
+como opção, mas no futuro temos planos para ter opção de sms também.
+
+Fluxo previsto:
+
+  1. Usuario envia email + senha no POST /login.
+  2. Servidor valida as credenciais.
+  3. Se corretas, gera um codigo -- ESCREVER AQUI A LOGICA DO 2FA.
+  4. Envia o codigo para o e-mail cadastrado.
+  5. Cliente envia o codigo via POST /login/-----DETERMINAR_ROTA-----.
+  6. Servidor valida o codigo (tempo e valor).
+  7. Se valido, gera ------ ESCREVER FIM DO 2FA.
+
+Boas praticas adotadas:
+  - Codigo invalido apos o primeiro uso (uso unico).
+  - Expiracao curta (10 min) para limitar a janela de ataque.
+  - Novo codigo invalida o anterior para o mesmo usuário.
+  - O e-mail não revela se o endereço existe no sistema
+    (resposta generica em caso de erro).
+
+4. SESSOES COM TEMPO DE EXPIRACAO
+
+Apos a verificação do 2FA, o servidor emite ------ ESCREVER APOS 2FA:
+
+  Access token  — expira em 15 minutos.
+    Usado em todas as requisições autenticadas.
+    Janela curta limita o dano caso o token seja interceptado.
+    Sem o refresh token, o atacante perde acesso em no maxímo
+    15 minutos sem precisar de nenhuma ação do usuário.
+
+  Refresh token — expira em 7 dias.
+    Usado exclusivamente para renovar o access token.
+    Fica armazenado localmente no dispositivo
+    pelo app Flutter (AuthLocalStorage).
+
+Justificativa do par access/refresh:
+  Usar apenas um token longo forcaria o usuário a logar de
+  novo a cada 15 min ou exigiria um token de longa duracao
+  (risco maior em caso de vazamento). O par
+  resolve os dois problemas: sessão fluida e janela de ataque
+  curta para o token que trafega em todas as requisicoes.
+
+5. INVALIDACAO DA SESSAO NO LOGOUT (#20)
+
+Estratégia atual:
+  O logout é realizado no cliente Flutter via
+  AuthLocalStorage.removeUser(), que apaga os tokens
+  armazenados localmente. Sem os tokens, o app não consegue
+  mais autenticar requisicões. O stream userObservable emite
+  NotLoggedUser, redirecionando para a tela de login.
+
+  Como o access token expira em 15 minutos, o impacto de
+  um token ainda válido apos o logout é limitado a essa
+  janela.
+
+6. EVIDENCIAS FUNCIONAIS
+
+As evidências de funcionamento do sistema de autenticação
+serão coletadas das seguintes formas:
+
+  a) Logs do servidor:
+     Cada requisição aos endpoints de será registrada
+     com timestamp, IP de origem, e-mail e
+     codigo de resposta HTTP. Tentativas bloqueadas pelo
+     rate limit aparecerão com status 429 - Too Many Requests.
+
+  b) Prints de testes manuais:
+     Capturas de tela do terminal mostrando coisas como
+     201 em um cadastro bem sucedido.
+
+  c) Inspecao direta do banco:
+     Queries mostrando que senhas não serão armazenadas 
+     em texto puro.
+
+  d) Teste de rate limit:
+     Script que dispara 6 requisicoes seguidas ao /login
+     e confirma que a sexta retorna HTTP 429.
+
+Os testes e logs ficarão na pasta /testes do camus_server.
+
+7. PROTECAO CONTRA FORCA BRUTA — Rate Limiting (#21)
+
+Sem limite de requisições, um atacante pode automatizar
+tentativas de login em escala, testando senhas vazadas ou combinações
+de caracteres sem nenhuma restrição.
+
+Estrategia adotada: rate limit por IP + por e-mail.
+
+  - Por IP: bloqueia ferramentas de varredura automatizada.
+  - Por e-mail: bloqueia ataques direcionados a uma conta
+    especifica, mesmo que venham de IPs variados (botnet).
+
+Limites definidos para os endpoints sensiveis:
+
+  POST /cadastrar        — 10 requisicoes por hora por IP
+
+  Apos atingir o limite:
+    HTTP 429 Too Many Requests
+
+
+Por que nao apenas bloqueio e atraso?
+
+  Bloqueio total de conta após poucas tentativas pode virar
+  um problema: um atacante erra senha várias
+  vezes e derruba o acesso do usuário legitimo. Atraso fixo
+  por tentativa tambem é limitado, porque bots distribuem
+  tentativas entre varios IPs e contas, contornando parte do
+  impacto. Por isso, o rate limiting por IP + e-mail é a base.
+  Ele reduz automação em escala com menos risco de bloquear
+  usuarios legitimos. Bloqueio temporario e atraso progressivo
+  entram como camada complementar e podem ser adicionados futuramente.
+
+
+8. VISAO GERAL DA DEFESA EM CAMADAS
+
+  Camada 1 — Prevencao de acesso em massa:
+    Rate limiting bloqueia automação antes mesmo de
+    chegar a validação de credenciais.
+
+  Camada 2 — Proteção da senha em repouso:
+    bcrypt garante que um vazamento do banco nao exponha
+    senhas úteis ao atacante.
+
+  Camada 3 — Verificacao de identidade com segundo fator:
+    2FA por e-mail garante que credenciais corretas
+    nao sejam suficientes sem acesso a conta de e-mail.
+
+  Essa combinacao segue o principio de defesa em profundidade:
+  cada camada é independente, de forma que a falha de uma
+  não compromete as demais.
+
