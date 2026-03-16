@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from database.db import criar_conexao, inicializar_banco
 from model.user import Usuario
 from repository.user_repository import RepositorioUsuario
+from security import gerar_hash_senha
 
 app = Flask(__name__)
 
@@ -36,10 +37,13 @@ def cadastrar_usuario():
         return jsonify(ERRO), 500
 
     try:
+
+        senha_hash = gerar_hash_senha(dados["senha"])
+
         usuario = Usuario(
             nome=dados["nome"],
             email=dados["email"],
-            senha=dados["senha"],
+            senha=senha_hash,
         )
         repositorio = RepositorioUsuario(conexao)
         usuario = repositorio.cadastrar(usuario)
