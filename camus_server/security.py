@@ -21,3 +21,15 @@ def gerar_hash_senha(senha: str) -> str:
     salt = bcrypt.gensalt(rounds=COST_FACTOR)
     senha_hash = bcrypt.hashpw(senha.encode("utf-8"), salt)
     return senha_hash.decode("utf-8")
+
+
+def verificar_senha(senha: str, senha_hash: str) -> bool:
+    """
+    A função bcrypt.checkpw() é utilizada para comparar a senha fornecida
+    pelo usuário com o hash armazenado no banco de dados. O bcrypt extrai
+    automaticamente o salt do hash armazenado e o utiliza para calcular o hash
+    da senha fornecida, garantindo uma comparação segura e eficiente."""
+    return bcrypt.checkpw(
+        senha.encode("utf-8"),
+        senha_hash.encode("utf-8")
+    )

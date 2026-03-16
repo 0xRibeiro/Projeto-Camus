@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 from database.db import criar_conexao, inicializar_banco
 from model.user import Usuario
 from repository.user_repository import RepositorioUsuario
-from security import gerar_hash_senha
+from security import gerar_hash_senha, verificar_senha
 
 from model.auth_code import AuthCode
 from repository.auth_code_repository import AuthCodeRepository
@@ -15,8 +15,6 @@ from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 load_dotenv()
-
-
 
 app = Flask(__name__)
 
@@ -55,6 +53,8 @@ def cadastrar_usuario():
         return jsonify(ERRO), 500
 
     try:
+
+        senha_hash = gerar_hash_senha(dados["senha"])
 
         usuario = Usuario(
             nome=dados["nome"],
@@ -118,7 +118,7 @@ def login():
         if not usuario:
             return jsonify({"error": "Usuario ou senha invalidos"}), 401
 
-        if usuario.senha != dados["senha"]:
+        if not verificar_senha(dados["senha"], usuario.senha):
             return jsonify({"error": "Usuario ou senha invalidos"}), 401
 
         codigo = str(random.randint(100000, 999999))
