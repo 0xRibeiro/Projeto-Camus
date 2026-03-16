@@ -1,0 +1,101 @@
+
+  FLUXO DE AUTENTICACAO — CAMUS SERVER
+
+
+1. CADASTRO  (POST /cadastrar)
+
+
+Cliente envia:
+  {
+    "nome":  "exemplo",
+    "email": "exemplo@email.com",
+    "senha": "minhasenha123"
+  }
+
+Servidor:
+  1. Valida que nome, email e senha estao presentes.
+  2. Verifica se o e-mail ja existe no banco (é um campo UNIQUE).
+  3. Gera hash da senha com bcrypt (custo 12).
+  4. Salva { nome, email, senha_hash } na tabela users.
+  5. Retorna:
+
+  HTTP 201
+  {
+    "id":    1,
+    "nome":  "exemplo",
+    "email": "exemplo@email.com"
+  }
+
+Erros possiveis:
+  400 — campo obrigatorio ausente
+  409 — e-mail ja cadastrado
+  429 - Muitas requisicões (Too many requests) = Usado para evitar brute force.
+  500 — falha interna
+
+2. LOGIN  (POST /login)
+
+Cliente envia:
+  {
+    "email":    "exemplo@email.com",
+    "password": "minhasenha123"
+  }
+
+Servidor:
+  1. Busca o usuario pelo e-mail na tabela users.
+  2. Compara a senha enviada com o hash armazenado.
+  3. Se invalido, retorna 401.
+  4. Gera access token (expira em 15 min)
+  5. Gera refresh token (expira em 7 dias):
+  6. Retorna:
+
+  HTTP 200
+  {
+    "id":           1,
+    "name":         "exemplo",
+    "email":        "exemplo@email.com",
+    "token":        "<access_token>",
+    "refreshToken": "<refresh_token>"
+  }
+
+
+Erros possiveis:
+  400 — campo obrigatorio ausente
+  401 — credenciais invalidas
+  500 — falha interna
+
+
+3. RENOVACAO DO TOKEN  (POST /refresh)
+
+Cliente envia (quando o access token expirar):
+  Header:  Authorization: Bearer <refresh_token>
+
+Servidor:
+  1. Decodifica e valida o refresh token.
+  2. Verifica que o usuario ainda existe no banco.
+  3. Gera novo access token (15 min).
+  4. Retorna:
+
+  HTTP 200
+  {
+    "token": "<novo_access_token>"
+  }
+
+Erros possiveis:
+  401 — refresh token invalido ou expirado
+
+
+5. LOGOUT
+
+
+O logout e tratado exclusivamente no Flutter:
+  - AuthLocalStorage.removeUser() apaga os tokens locais.
+  - O stream userObservable emite NotLoggedUser.
+  - O servidor não precisa de um endpoint de logout enquanto
+    nao houver blacklist de tokens.
+
+6. RESUMO DE ENDPOINTS DE AUTH
+
+  POST /cadastrar   — cria conta
+  POST /login       — autentica e devolve tokens -----A FAZER
+  POST /refresh     — renova o access token ------- A FAZER
+
