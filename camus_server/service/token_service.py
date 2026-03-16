@@ -1,7 +1,7 @@
 import os
 import uuid
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,15 +12,16 @@ JWT_EXPIRE_DAYS = int(os.getenv("JWT_EXPIRE_DAYS", "7"))
 
 
 def gerar_token(user_id: int):
-    agora = datetime.utcnow()
+
+    agora = datetime.now(timezone.utc)
     expira_em = agora + timedelta(days=JWT_EXPIRE_DAYS)
+
     token_jti = str(uuid.uuid4())
 
     payload = {
         "sub": str(user_id),
         "jti": token_jti,
-        "iat": int(agora.timestamp()),
-        "exp": int(expira_em.timestamp()),
+        "exp": expira_em,
     }
 
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -33,4 +34,13 @@ def gerar_token(user_id: int):
 
 
 def validar_token(token: str):
-    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+
+    return jwt.decode(
+        token,
+        JWT_SECRET,
+        algorithms=[JWT_ALGORITHM],
+        options={
+            "require": ["exp", "sub", "jti"]
+        },
+        leeway=10,
+    )

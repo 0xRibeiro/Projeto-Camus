@@ -103,8 +103,9 @@ def autenticar_requisicao(conexao):
         payload = validar_token(token)
     except jwt.ExpiredSignatureError:
         return None, (jsonify({"error": "Token expirado"}), 401)
-    except jwt.InvalidTokenError:
-        return None, (jsonify({"error": "Token invalido"}), 401)
+    except jwt.InvalidTokenError as e:
+        app.logger.warning(f"token_invalido: {str(e)}")
+        return None, (jsonify({"error": f"Token invalido: {str(e)}"}), 401)
 
     token_jti = payload.get("jti")
     user_id = payload.get("sub")
