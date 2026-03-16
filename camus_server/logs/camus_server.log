@@ -1,0 +1,75 @@
+2026-03-16 03:08:07,995 INFO banco_inicializacao_sucesso
+2026-03-16 03:08:08,386 INFO banco_inicializacao_sucesso
+2026-03-16 03:21:11,659 INFO cadastro_sucesso
+2026-03-16 03:21:41,690 INFO verificar_codigo_sucesso
+2026-03-16 03:22:09,785 INFO login_codigo_enviado
+2026-03-16 03:22:23,043 INFO verificar_codigo_sucesso
+2026-03-16 04:05:17,804 INFO banco_inicializacao_sucesso
+2026-03-16 04:05:20,305 INFO banco_inicializacao_sucesso
+2026-03-16 04:05:21,916 INFO banco_inicializacao_sucesso
+2026-03-16 04:05:23,359 INFO banco_inicializacao_sucesso
+2026-03-16 04:10:11,467 INFO banco_inicializacao_sucesso
+2026-03-16 04:10:11,849 INFO banco_inicializacao_sucesso
+2026-03-16 04:10:20,217 INFO login_codigo_enviado
+2026-03-16 04:10:44,727 INFO verificar_codigo_sucesso
+2026-03-16 04:11:16,454 INFO login_codigo_enviado
+2026-03-16 04:11:45,518 WARNING verificar_codigo_invalido_ou_expirado
+2026-03-16 04:12:21,093 INFO verificar_codigo_sucesso
+2026-03-16 04:20:19,903 INFO login_codigo_enviado
+2026-03-16 04:20:33,242 INFO verificar_codigo_sucesso
+2026-03-16 04:20:57,182 ERROR cadastro_falha
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/.venv/lib/python3.14/site-packages/mysql/connector/connection_cext.py", line 772, in cmd_query
+    self._cmysql.query(
+    ~~~~~~~~~~~~~~~~~~^
+        query,
+        ^^^^^^
+    ...<3 lines>...
+        query_attrs=self.query_attrs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+_mysql_connector.MySQLInterfaceError: Duplicate entry 'milho135@gmail.com' for key 'email'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/app.py", line 109, in cadastrar_usuario
+    usuario = repositorio_usuario.cadastrar(usuario)
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/repository/user_repository.py", line 9, in cadastrar
+    cursor.execute(
+    ~~~~~~~~~~~~~~^
+        "INSERT INTO users (nome, email, senha) VALUES (%s, %s, %s)",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (usuario.nome, usuario.email, usuario.senha),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/.venv/lib/python3.14/site-packages/mysql/connector/cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._stmt_partition["mappable_stmt"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        raw_as_string=self._raw_as_string,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/.venv/lib/python3.14/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/.venv/lib/python3.14/site-packages/mysql/connector/connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+        err.errno, msg=err.msg, sqlstate=err.sqlstate
+    ) from err
+mysql.connector.errors.IntegrityError: 1062 (23000): Duplicate entry 'milho135@gmail.com' for key 'email'
+2026-03-16 04:21:27,157 INFO cadastro_sucesso
+2026-03-16 04:21:45,410 INFO verificar_codigo_sucesso
+2026-03-16 04:31:48,336 INFO cadastro_sucesso
+2026-03-16 04:32:09,244 INFO verificar_codigo_sucesso
+2026-03-16 04:32:27,796 INFO login_codigo_enviado
+2026-03-16 04:32:41,886 INFO verificar_codigo_sucesso
+2026-03-16 04:37:51,323 WARNING login_senha_invalida
+2026-03-16 04:38:00,657 INFO login_codigo_enviado
+2026-03-16 04:38:18,807 INFO verificar_codigo_sucesso
+2026-03-16 04:39:03,289 INFO cadastro_sucesso
+2026-03-16 04:39:30,346 INFO verificar_codigo_sucesso

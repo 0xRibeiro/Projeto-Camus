@@ -1,8 +1,9 @@
+import 'package:camus_app/main.dart';
 import 'package:camus_app/ui/auth/widgets/login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:camus_app/ui/auth/two_factor_viewmodel.dart';
 import 'package:camus_app/ui/auth/widgets/two_factor_code_field.dart';
-import 'package:camus_app/ui/home/home_page.dart';
+import 'package:routefly/routefly.dart';
 
 class TwoFactorPage extends StatefulWidget {
   const TwoFactorPage({super.key});
@@ -22,6 +23,7 @@ class _TwoFactorPageState extends State<TwoFactorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final challengeId = Routefly.query.arguments['challengeId'] as int;
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F8),
       body: SafeArea(
@@ -64,10 +66,7 @@ class _TwoFactorPageState extends State<TwoFactorPage> {
               child: Text(
                 'Digite o código de 6 dígitos enviado para o seu e-mail cadastrado',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF666666),
-                ),
+                style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
               ),
             ),
             const SizedBox(height: 32),
@@ -79,10 +78,7 @@ class _TwoFactorPageState extends State<TwoFactorPage> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF003459),
-                      Color(0xFF0070BF),
-                    ],
+                    colors: [Color(0xFF003459), Color(0xFF0070BF)],
                   ),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(32),
@@ -130,15 +126,11 @@ class _TwoFactorPageState extends State<TwoFactorPage> {
                             text: 'Verificar',
                             isLoading: loading,
                             onPressed: () async {
-                              final bool success = await viewModel.verifyCode();
-
+                              final success = await viewModel.verifyCode(
+                                challengeId,
+                              );
                               if (success && mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const HomePage(),
-                                  ),
-                                );
+                                Routefly.navigate(routePaths.home);
                               }
                             },
                           );
@@ -183,10 +175,7 @@ class _TwoFactorPageState extends State<TwoFactorPage> {
                       const SizedBox(height: 12),
                       const Text(
                         'Código fake para teste: 123456',
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.white54, fontSize: 12),
                       ),
                     ],
                   ),

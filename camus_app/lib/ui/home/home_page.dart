@@ -42,7 +42,10 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (user != null) UserCard(user: user),
+            if (user != null)
+              UserCard(user: user)
+            else
+              const Text('Nenhum usuário carregado'),
             const SizedBox(height: 16),
             LogoutButton(
               onPressed: () async {

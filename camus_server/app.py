@@ -229,11 +229,19 @@ def verificar_codigo():
 
         repo.marcar_usado(challenge_id)
 
+        repo_usuario = RepositorioUsuario(conexao)
+        usuario = repo_usuario.buscar_por_id(resultado["user_id"])
+        
+        if not usuario:
+            app.logger.warning("verificar_codigo_usuario_nao_encontrado")
+            return jsonify({"error": "Usuario nao encontrado"}), 404
+        
         app.logger.info("verificar_codigo_sucesso")
-
+        
         return jsonify({
             "ok": True,
-            "message": "Autenticacao concluida"
+            "message": "Autenticacao concluida",
+            "user": usuario.para_json()
         }), 200
 
     except Exception:

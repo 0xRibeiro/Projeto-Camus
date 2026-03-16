@@ -1,4 +1,6 @@
+import 'package:camus_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:routefly/routefly.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
 import 'widgets/repeat_password_field.dart';
@@ -6,7 +8,6 @@ import 'widgets/username_field.dart';
 import 'widgets/login_button.dart';
 import 'register_viewmodel.dart';
 import 'package:camus_app/ui/auth/login_page.dart';
-import 'package:camus_app/ui/home/home_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -143,13 +144,12 @@ class _RegisterPageState extends State<RegisterPage> {
                             text: 'Cadastrar',
                             isLoading: loading,
                             onPressed: () async {
-                              final bool success = await viewModel.register();
-                              if (success && mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const HomePage(),
-                                  ),
+                              final challengeId = await viewModel.register();
+
+                              if (challengeId != null && mounted) {
+                                Routefly.push(
+                                  routePaths.auth.twoFactor,
+                                  arguments: {"challengeId": challengeId},
                                 );
                               }
                             },

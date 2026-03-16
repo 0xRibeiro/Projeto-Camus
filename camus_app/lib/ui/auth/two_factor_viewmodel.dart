@@ -1,4 +1,8 @@
+import 'package:camus_app/config/dependencies.dart';
+import 'package:camus_app/data/repositories/auth/auth_repository.dart';
+import 'package:camus_app/domain/dtos/verify_code_dto.dart';
 import 'package:flutter/material.dart';
+import 'package:camus_app/ui/home/home_viewmodel.dart';
 
 class TwoFactorViewModel {
   final TextEditingController codeController = TextEditingController();
@@ -8,43 +12,36 @@ class TwoFactorViewModel {
   final ValueNotifier<String?> errorMessage = ValueNotifier(null);
   final ValueNotifier<String?> successMessage = ValueNotifier(null);
 
-  Future<bool> verifyCode() async {
+  final AuthRepository _authRepository = injector.get<AuthRepository>();
+
+  Future<bool> verifyCode(int challengeId) async {
     isLoading.value = true;
     errorMessage.value = null;
-    successMessage.value = null;
 
-    await Future.delayed(const Duration(seconds: 1));
+    final dto = VerifyCodeDTO(
+      challengeId: challengeId,
+      codigo: codeController.text.trim(),
+    );
 
-    final String code = codeController.text.trim();
-
-    if (code.isEmpty) {
-      errorMessage.value = 'Digite o código enviado no e-mail';
-      isLoading.value = false;
-      return false;
-    }
-
-    if (code.length != 6) {
-      errorMessage.value = 'O código deve ter 6 dígitos';
-      isLoading.value = false;
-      return false;
-    }
-
-    if (!RegExp(r'^\d{6}$').hasMatch(code)) {
-      errorMessage.value = 'Digite apenas números';
-      isLoading.value = false;
-      return false;
-    }
-
-    const String fakeValidCode = '123456';
-
-    final bool success = code == fakeValidCode;
-
-    if (!success) {
-      errorMessage.value = 'Código inválido';
-    }
+    final result = await _authRepository.verifyCode(dto);
 
     isLoading.value = false;
-    return success;
+
+    return result.fold(
+      (success) {
+        final homeVM = injector.get<HomeViewModel>();
+        
+        homeVM.user = success.user;
+        homeVM.notifyListeners();
+
+        return true;
+      },
+
+      (error) {
+        errorMessage.value = "Código inválido";
+        return false;
+      },
+    );
   }
 
   Future<void> resendCode() async {
