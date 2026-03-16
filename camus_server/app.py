@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from database.db import criar_conexao, inicializar_banco
 from model.user import Usuario
 from repository.user_repository import RepositorioUsuario
+from security import gerar_hash_senha
 
 from model.auth_code import AuthCode
 from repository.auth_code_repository import AuthCodeRepository
@@ -58,7 +59,7 @@ def cadastrar_usuario():
         usuario = Usuario(
             nome=dados["nome"],
             email=dados["email"],
-            senha=dados["senha"],
+            senha=senha_hash,
         )
 
         repositorio_usuario = RepositorioUsuario(conexao)
