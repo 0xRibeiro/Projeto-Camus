@@ -49,6 +49,22 @@ def cadastrar_usuario():
     finally:
         conexao.close()
 
+@app.get("/usuarios")
+def listar_usuarios():
+    conexao = criar_conexao()
+    if not conexao:
+        return jsonify(ERRO), 500
+
+    try:
+        repositorio = RepositorioUsuario(conexao)
+        usuarios = repositorio.listar()
+        return jsonify([u.para_json() for u in usuarios]), 200
+    except Exception:
+        return jsonify(ERRO), 500
+    finally:
+        conexao.close()
+
+
 if __name__ == "__main__":
     if not preparar_banco():
         raise RuntimeError("Nao foi possivel inicializar o banco MySQL")
