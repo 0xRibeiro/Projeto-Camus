@@ -95,6 +95,61 @@ def cadastrar_usuario():
         conexao.close()
 
 
+@app.post("/login")
+def login():
+
+    dados = request.get_json(silent=True) or {}
+
+    if any(not dados.get(campo) for campo in ("email", "senha")):
+        return jsonify({"error": "Campos obrigatorios"}), 400
+
+    conexao = criar_conexao()
+
+    if not conexao:
+        return jsonify(ERRO), 500
+
+    try:
+
+        repo_usuario = RepositorioUsuario(conexao)
+
+        usuario = repo_usuario.buscar_por_email(dados["email"])
+
+        if not usuario:
+            return jsonify({"error": "Usuario ou senha invalidos"}), 401
+
+        if usuario.senha != dados["senha"]:
+            return jsonify({"error": "Usuario ou senha invalidos"}), 401
+
+        codigo = str(random.randint(100000, 999999))
+
+        expira = datetime.now() + timedelta(minutes=10)
+
+        auth_repo = AuthCodeRepository(conexao)
+
+        auth_code = AuthCode(
+            user_id=usuario.id,
+            codigo=codigo,
+            tipo="login",
+            expira_em=expira,
+        )
+
+        auth_code = auth_repo.criar(auth_code)
+
+        enviar_codigo(usuario.email, codigo)
+
+        return jsonify({
+            "requires_2fa": True,
+            "challenge_id": auth_code.id,
+            "message": "Codigo enviado para o email"
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        conexao.close()
+
+
 @app.post("/verificar-codigo")
 def verificar_codigo():
 
