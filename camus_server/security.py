@@ -2,6 +2,7 @@ import bcrypt
 
 # 1.1 Uso de hash criptográfico seguro para senhas (bcrypt)
 # 1.2 Parâmetros de custo do hash configurados e justificados
+# 2.1 Funcionalidade de recuperação de senha implementada
 # fator de custo do bcrypt (recomendado)
 COST_FACTOR = 12  
 
