@@ -5,6 +5,7 @@ import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
 import 'widgets/login_button.dart';
 import 'login_viewmodel.dart';
+import 'package:camus_app/ui/auth/forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -117,7 +118,12 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.center,
                         child: TextButton(
                           onPressed: () {
-                            // aqui navegar para esqueci senha
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordPage(),
+                              ),
+                            );
                           },
                           child: const Text(
                             'Esqueci minha senha',
@@ -135,9 +141,12 @@ class _LoginPageState extends State<LoginPage> {
                           return LoginButton(
                             text: 'Entrar',
                             onPressed: () async {
-                              bool success = await viewModel.login();
-                              if (success && mounted) {
-                                Routefly.push(routePaths.auth.twoFactor);
+                              final challengeId = await viewModel.login();
+                              if (challengeId != null && mounted) {
+                                Routefly.push(
+                                  routePaths.auth.twoFactor,
+                                  arguments: {"challengeId": challengeId},
+                                );
                               }
                             },
                             isLoading: loading,
