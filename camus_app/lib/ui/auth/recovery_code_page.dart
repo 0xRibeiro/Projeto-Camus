@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:camus_app/ui/auth/recovery_code_page.dart';
+import 'package:camus_app/ui/auth/reset_password_page.dart';
 
-class ForgotPasswordPage extends StatelessWidget {
-  const ForgotPasswordPage({super.key});
+class RecoveryCodePage extends StatelessWidget {
+  const RecoveryCodePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class ForgotPasswordPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                "Esqueci minha senha",
+                "Código de Recuperação",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -29,7 +29,7 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               const Text(
-                "Insira seu Email.",
+                "Insira o código enviado para seu Email.",
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF1F4E5F),
@@ -37,8 +37,9 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               TextField(
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  hintText: "Digite seu Email",
+                  hintText: "Digite o código",
                   filled: true,
                   fillColor: const Color(0xFFD6E3EA),
                   contentPadding:
@@ -54,13 +55,11 @@ class ForgotPasswordPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navega para a tela de código de recuperação
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const RecoveryCodePage()),
-                    );
-                  },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ResetPasswordPage()),
+                      );
+                    },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0A3A4A),
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -69,14 +68,14 @@ class ForgotPasswordPage extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    "Enviar Código",
+                    "Validar Código",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
               const SizedBox(height: 40),
               const Text(
-                "Você tem uma conta?",
+                "Não recebeu o código?",
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
@@ -95,7 +94,7 @@ class ForgotPasswordPage extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    "Fazer Login",
+                    "Reenviar Código",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
