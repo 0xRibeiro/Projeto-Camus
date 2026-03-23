@@ -1,42 +1,24 @@
-# -------------------------
 # Python
-# -------------------------
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+.venv/
+*.log
 
-# compiled extensions
-*.so
-
-# virtual environments
-venv/
-.env/
-
-# environment variables
+# Variáveis de ambiente
 .env
 .env.*
 !.env.example
 
-# logs
-*.log
-
-# -------------------------
 # Flutter / Dart
-# -------------------------
+build/
 .dart_tool/
 .packages
-.pub/
-build/
-flutter_export_environment.sh
 
-# -------------------------
 # IDE
-# -------------------------
 .vscode/
 .idea/
 
-# -------------------------
-# OS
-# -------------------------
+# Arquivos do sistema operacional
 .DS_Store
 Thumbs.db

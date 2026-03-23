@@ -59,3 +59,11 @@ class RepositorioUsuario:
                 email=row[2],
                 senha=row[3],
             )
+
+    def atualizar_senha(self, user_id: int, senha_hash: str):
+        with self.conexao.cursor() as cursor:
+            cursor.execute(
+                "UPDATE users SET senha = %s WHERE id = %s",
+                (senha_hash, user_id),
+            )
+            self.conexao.commit()
