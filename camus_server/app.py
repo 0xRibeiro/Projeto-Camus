@@ -331,6 +331,99 @@ def verificar_codigo():
         conexao.close()
 
 
+@app.post("/recuperar-senha")
+@limiter.limit("5 per minute")
+def solicitar_recuperacao_senha():
+
+    dados = request.get_json(silent=True) or {}
+    email = (dados.get("email") or "").strip().lower()
+
+    app.logger.info("recuperar_senha_requisicao_recebida")
+
+    if not email:
+        app.logger.warning("recuperar_senha_validacao_falha")
+        return jsonify({"error": "Campo obrigatorio: email"}), 400
+
+    try:
+        #metodo do lucas entra aqui
+
+        app.logger.info("recuperar_senha_sucesso")
+
+        return jsonify({
+            "ok": True,
+            "message": "Endpoint de recuperacao executado com sucesso",
+            "email": email,
+        }), 200
+
+    except Exception:
+        app.logger.exception("recuperar_senha_falha")
+        return jsonify(ERRO), 500
+
+
+@app.post("/redefinir-senha")
+@limiter.limit("5 per minute")
+def redefinir_senha():
+
+    dados = request.get_json(silent=True) or {}
+    token = (dados.get("token") or "").strip()
+    nova_senha = dados.get("nova_senha") or ""
+
+    app.logger.info("redefinir_senha_requisicao_recebida")
+
+    if not token or not nova_senha:
+        app.logger.warning("redefinir_senha_validacao_falha")
+        return jsonify({"error": "Campos obrigatorios: token e nova_senha"}), 400
+
+    if len(nova_senha) < 8:
+        app.logger.warning("redefinir_senha_senha_fraca")
+        return jsonify({"error": "A nova senha deve ter ao menos 8 caracteres"}), 400
+
+    try:
+        payload = validar_token(token)
+        user_id = int(payload.get("sub"))
+    except jwt.ExpiredSignatureError:
+        app.logger.warning("redefinir_senha_token_expirado")
+        return jsonify({"error": "Token expirado"}), 401
+    except (jwt.InvalidTokenError, TypeError, ValueError) as e:
+        app.logger.warning(f"redefinir_senha_token_invalido: {str(e)}")
+        return jsonify({"error": "Token invalido"}), 401
+
+    conexao = criar_conexao()
+
+    if not conexao:
+        app.logger.error("redefinir_senha_erro_conexao")
+        return jsonify(ERRO), 500
+
+    try:
+        repo_usuario = RepositorioUsuario(conexao)
+        usuario = repo_usuario.buscar_por_id(user_id)
+
+        if not usuario:
+            app.logger.warning("redefinir_senha_usuario_nao_encontrado")
+            return jsonify({"error": "Usuario nao encontrado"}), 404
+
+        senha_hash = gerar_hash_senha(nova_senha)
+        repo_usuario.atualizar_senha(usuario.id, senha_hash)
+
+        # Invalida as sessões existentes após trocar a senha.
+        repo_sessao = SessionRepository(conexao)
+        repo_sessao.invalidar_todas_por_usuario(usuario.id)
+
+        app.logger.info("redefinir_senha_sucesso")
+
+        return jsonify({
+            "ok": True,
+            "message": "Senha redefinida com sucesso"
+        }), 200
+
+    except Exception:
+        app.logger.exception("redefinir_senha_falha")
+        return jsonify(ERRO), 500
+
+    finally:
+        conexao.close()
+
+
 @app.get("/me")
 def me():
 
