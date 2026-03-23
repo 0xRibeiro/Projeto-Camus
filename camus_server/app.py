@@ -23,6 +23,10 @@ from model.session import Session
 from repository.session_repository import SessionRepository
 from service.token_service import gerar_token, validar_token
 
+from model.recovery_session import RecoverySession
+from repository.recovery_session_repository import RecoverySessionRepository
+from service.token_service import gerar_token, validar_token, gerar_token_recuperacao
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -329,6 +333,52 @@ def verificar_codigo():
 
     finally:
         conexao.close()
+        
+        
+@app.post("/verificar-codigo-recuperacao")
+@limiter.limit("5 per minute")
+def verificar_codigo_recuperacao():
+
+    dados = request.get_json(silent=True) or {}
+    challenge_id = dados.get("challenge_id")
+    codigo = dados.get("codigo")
+
+    if not challenge_id or not codigo:
+        return jsonify({"error": "challenge_id e codigo obrigatorios"}), 400
+
+    conexao = criar_conexao()
+
+    try:
+        repo_codigo = AuthCodeRepository(conexao)
+
+        resultado = repo_codigo.buscar_valido(challenge_id, codigo)
+
+        if not resultado or resultado["tipo"] != "password_reset":
+            return jsonify({"error": "Codigo invalido"}), 400
+
+        repo_codigo.marcar_usado(challenge_id)
+
+        user_id = resultado["user_id"]
+
+        token_data = gerar_token_recuperacao(user_id)
+
+        repo_recovery = RecoverySessionRepository(conexao)
+
+        repo_recovery.criar(
+            RecoverySession(
+                user_id=user_id,
+                token_jti=token_data["token_jti"],
+                expira_em=token_data["expira_em"],
+            )
+        )
+
+        return jsonify({
+            "ok": True,
+            "token": token_data["token"],
+        }), 200
+
+    finally:
+        conexao.close()
 
 
 @app.post("/recuperar-senha")
@@ -344,21 +394,53 @@ def solicitar_recuperacao_senha():
         app.logger.warning("recuperar_senha_validacao_falha")
         return jsonify({"error": "Campo obrigatorio: email"}), 400
 
+    conexao = criar_conexao()
+
+    if not conexao:
+        app.logger.error("recuperar_senha_erro_conexao")
+        return jsonify(ERRO), 500
+
     try:
-        #metodo do lucas entra aqui
+        repo_usuario = RepositorioUsuario(conexao)
+        usuario = repo_usuario.buscar_por_email(email)
+
+        # resposta generica para nao revelar se o email existe
+        if not usuario:
+            app.logger.info("recuperar_senha_email_nao_encontrado")
+            return jsonify({
+                "ok": True,
+                "message": "Se o e-mail existir, as instrucoes foram enviadas"
+            }), 200
+
+        codigo = str(random.randint(100000, 999999))
+        expira = datetime.now() + timedelta(minutes=10)
+
+        repo_codigo = AuthCodeRepository(conexao)
+        auth_code = AuthCode(
+            user_id=usuario.id,
+            codigo=codigo,
+            tipo="password_reset",
+            expira_em=expira,
+        )
+
+        auth_code = repo_codigo.criar(auth_code)
+
+        enviar_codigo(usuario.email, codigo)
 
         app.logger.info("recuperar_senha_sucesso")
 
         return jsonify({
             "ok": True,
-            "message": "Endpoint de recuperacao executado com sucesso",
-            "email": email,
+            "message": "Se o e-mail existir, as instrucoes foram enviadas",
+            "challenge_id": auth_code.id,
         }), 200
 
     except Exception:
         app.logger.exception("recuperar_senha_falha")
         return jsonify(ERRO), 500
 
+    finally:
+        conexao.close()
 
 @app.post("/redefinir-senha")
 @limiter.limit("5 per minute")
@@ -381,6 +463,13 @@ def redefinir_senha():
     try:
         payload = validar_token(token)
         user_id = int(payload.get("sub"))
+        token_jti = payload.get("jti")
+        token_type = payload.get("type")
+
+        if token_type != "recovery":
+            app.logger.warning("redefinir_senha_tipo_token_invalido")
+            return jsonify({"error": "Token invalido"}), 401
+
     except jwt.ExpiredSignatureError:
         app.logger.warning("redefinir_senha_token_expirado")
         return jsonify({"error": "Token expirado"}), 401
@@ -395,6 +484,13 @@ def redefinir_senha():
         return jsonify(ERRO), 500
 
     try:
+        repo_recovery = RecoverySessionRepository(conexao)
+        recovery_session = repo_recovery.buscar_ativa_por_jti(token_jti)
+
+        if not recovery_session:
+            app.logger.warning("redefinir_senha_recovery_session_invalida")
+            return jsonify({"error": "Sessao de recuperacao invalida ou expirada"}), 401
+
         repo_usuario = RepositorioUsuario(conexao)
         usuario = repo_usuario.buscar_por_id(user_id)
 
@@ -405,7 +501,13 @@ def redefinir_senha():
         senha_hash = gerar_hash_senha(nova_senha)
         repo_usuario.atualizar_senha(usuario.id, senha_hash)
 
-        # Invalida as sessões existentes após trocar a senha.
+        # invalida a sessao de recuperacao usada
+        repo_recovery.invalidar_por_jti(token_jti)
+
+        # invalida outras sessoes de recuperacao do mesmo usuario
+        repo_recovery.invalidar_todas_por_usuario(usuario.id)
+
+        # invalida as sessões existentes após trocar a senha
         repo_sessao = SessionRepository(conexao)
         repo_sessao.invalidar_todas_por_usuario(usuario.id)
 
@@ -422,7 +524,6 @@ def redefinir_senha():
 
     finally:
         conexao.close()
-
 
 @app.get("/me")
 def me():
