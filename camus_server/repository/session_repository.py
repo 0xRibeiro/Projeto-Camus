@@ -52,3 +52,15 @@ class SessionRepository:
                 (token_jti,),
             )
             self.conexao.commit()
+
+    def invalidar_todas_por_usuario(self, user_id: int):
+        with self.conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE sessions
+                SET invalidada = TRUE
+                WHERE user_id = %s
+                """,
+                (user_id,),
+            )
+            self.conexao.commit()
