@@ -215,3 +215,11 @@ mysql.connector.errors.IntegrityError: 1062 (23000): Duplicate entry 'teste@test
 2026-03-23 01:29:30,863 INFO verificar_codigo_sucesso
 2026-03-23 01:29:30,943 INFO me_sucesso
 2026-03-23 01:29:46,377 INFO logout_sucesso
+2026-03-23 01:34:18,329 INFO cadastro_sucesso
+2026-03-23 01:34:38,596 INFO verificar_codigo_sucesso
+2026-03-23 01:34:38,644 INFO me_sucesso
+2026-03-23 01:35:44,080 INFO login_codigo_enviado
+2026-03-23 01:35:55,997 WARNING verificar_codigo_invalido_ou_expirado
+2026-03-23 01:36:02,324 INFO verificar_codigo_sucesso
+2026-03-23 01:36:02,382 INFO me_sucesso
+2026-03-23 01:36:11,790 INFO logout_sucesso
