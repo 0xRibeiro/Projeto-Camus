@@ -1,11 +1,12 @@
 import 'package:camus_app/data/services/auth/client_http.dart';
+import 'package:camus_app/domain/dtos/auth_challenge.dart';
 import 'package:camus_app/domain/dtos/credentials.dart';
 import 'package:camus_app/domain/dtos/register_dto.dart';
-import 'package:camus_app/domain/dtos/auth_challenge.dart';
 import 'package:camus_app/domain/dtos/verify_code_dto.dart';
-import 'package:result_dart/result_dart.dart';
-import 'package:dio/dio.dart';
 import 'package:camus_app/domain/dtos/verify_code_response.dart';
+import 'package:camus_app/domain/entities/user_entity.dart';
+import 'package:dio/dio.dart';
+import 'package:result_dart/result_dart.dart';
 
 class AuthClientHttp {
   final ClientHttp _clientHttp;
@@ -37,9 +38,42 @@ class AuthClientHttp {
     final response = await _clientHttp.post("/verificar-codigo", dto.toJson());
 
     return response.map((response) {
-      final http = response as Response;
-
-      return VerifyCodeResponse.fromJson(http.data);
+      final httpResponse = response as Response;
+      return VerifyCodeResponse.fromJson(httpResponse.data);
     });
+  }
+
+  AsyncResult<LoggedUser> getMe(String token) async {
+    final response = await _clientHttp.get(
+      "/me",
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    return response.map((response) {
+      final httpResponse = response as Response;
+      final json = httpResponse.data as Map<String, dynamic>;
+
+      return LoggedUser(
+        id: json["id"],
+        name: json["nome"],
+        email: json["email"],
+        token: token,
+        refreshToken: "",
+      );
+    });
+  }
+
+  AsyncResult<Unit> logout(String token) async {
+    final response = await _clientHttp.post(
+      "/logout",
+      {},
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    return response.map((_) => unit);
   }
 }

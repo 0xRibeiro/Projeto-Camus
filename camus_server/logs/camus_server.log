@@ -99,3 +99,119 @@ mysql.connector.errors.IntegrityError: 1062 (23000): Duplicate entry 'milho135@g
 2026-03-16 10:25:54,221 INFO verificar_codigo_sucesso
 2026-03-16 10:26:30,342 INFO me_sucesso
 2026-03-16 10:27:51,269 INFO logout_sucesso
+2026-03-23 00:35:40,105 INFO banco_inicializacao_sucesso
+2026-03-23 00:35:40,447 INFO banco_inicializacao_sucesso
+2026-03-23 00:56:12,044 ERROR cadastro_falha
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/app.py", line 185, in cadastrar_usuario
+    enviar_codigo(usuario.email, codigo)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/service/email_service.py", line 35, in enviar_codigo
+    servidor.login(EMAIL_REMETENTE, EMAIL_SENHA)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/smtplib.py", line 762, in login
+    raise last_exception
+  File "/usr/lib/python3.14/smtplib.py", line 751, in login
+    (code, resp) = self.auth(
+                   ~~~~~~~~~^
+        authmethod, getattr(self, method_name),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        initial_response_ok=initial_response_ok)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/smtplib.py", line 669, in auth
+    raise SMTPAuthenticationError(code, resp)
+smtplib.SMTPAuthenticationError: (534, b'5.7.9 Application-specific password required. For more information, go to\n5.7.9  https://support.google.com/mail/?p=InvalidSecondFactor 5a478bee46e88-2c10b31bef1sm14372782eec.26 - gsmtp')
+2026-03-23 00:58:32,270 ERROR login_falha
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/app.py", line 248, in login
+    enviar_codigo(usuario.email, codigo)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/service/email_service.py", line 35, in enviar_codigo
+    servidor.login(EMAIL_REMETENTE, EMAIL_SENHA)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/smtplib.py", line 762, in login
+    raise last_exception
+  File "/usr/lib/python3.14/smtplib.py", line 751, in login
+    (code, resp) = self.auth(
+                   ~~~~~~~~~^
+        authmethod, getattr(self, method_name),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        initial_response_ok=initial_response_ok)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/smtplib.py", line 669, in auth
+    raise SMTPAuthenticationError(code, resp)
+smtplib.SMTPAuthenticationError: (534, b'5.7.9 Application-specific password required. For more information, go to\n5.7.9  https://support.google.com/mail/?p=InvalidSecondFactor 5a478bee46e88-2c10b1a88e5sm14164847eec.13 - gsmtp')
+2026-03-23 01:02:22,619 INFO banco_inicializacao_sucesso
+2026-03-23 01:02:22,943 INFO banco_inicializacao_sucesso
+2026-03-23 01:02:45,411 INFO cadastro_sucesso
+2026-03-23 01:03:25,137 ERROR verificar_codigo_falha
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/app.py", line 306, in verificar_codigo
+    token_data = gerar_token(usuario.id)
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/service/token_service.py", line 28, in gerar_token
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+            ^^^^^^^^^^
+AttributeError: module 'jwt' has no attribute 'encode'
+2026-03-23 01:03:47,672 WARNING verificar_codigo_invalido_ou_expirado
+2026-03-23 01:06:35,761 INFO cadastro_sucesso
+2026-03-23 01:07:00,289 ERROR verificar_codigo_falha
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/app.py", line 306, in verificar_codigo
+    token_data = gerar_token(usuario.id)
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/service/token_service.py", line 28, in gerar_token
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+            ^^^^^^^^^^
+AttributeError: module 'jwt' has no attribute 'encode'
+2026-03-23 01:08:59,435 INFO banco_inicializacao_sucesso
+2026-03-23 01:08:59,763 INFO banco_inicializacao_sucesso
+2026-03-23 01:09:12,026 ERROR cadastro_falha
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/venv/lib/python3.14/site-packages/mysql/connector/connection_cext.py", line 772, in cmd_query
+    self._cmysql.query(
+    ~~~~~~~~~~~~~~~~~~^
+        query,
+        ^^^^^^
+    ...<3 lines>...
+        query_attrs=self.query_attrs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+_mysql_connector.MySQLInterfaceError: Duplicate entry 'teste@teste.com' for key 'email'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/app.py", line 169, in cadastrar_usuario
+    usuario = repositorio_usuario.cadastrar(usuario)
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/repository/user_repository.py", line 11, in cadastrar
+    cursor.execute(
+    ~~~~~~~~~~~~~~^
+        "INSERT INTO users (nome, email, senha) VALUES (%s, %s, %s)",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (usuario.nome, usuario.email, usuario.senha),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/venv/lib/python3.14/site-packages/mysql/connector/cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._stmt_partition["mappable_stmt"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        raw_as_string=self._raw_as_string,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/venv/lib/python3.14/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/lunomeu/Projects/Projeto-Camus/camus_server/venv/lib/python3.14/site-packages/mysql/connector/connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+        err.errno, msg=err.msg, sqlstate=err.sqlstate
+    ) from err
+mysql.connector.errors.IntegrityError: 1062 (23000): Duplicate entry 'teste@teste.com' for key 'email'
+2026-03-23 01:10:07,742 INFO cadastro_sucesso
+2026-03-23 01:10:31,588 INFO verificar_codigo_sucesso
+2026-03-23 01:29:12,308 INFO login_codigo_enviado
+2026-03-23 01:29:30,863 INFO verificar_codigo_sucesso
+2026-03-23 01:29:30,943 INFO me_sucesso
+2026-03-23 01:29:46,377 INFO logout_sucesso

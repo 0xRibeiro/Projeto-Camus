@@ -1,28 +1,24 @@
 import 'package:camus_app/domain/entities/user_entity.dart';
 
 class VerifyCodeResponse {
-
   final bool ok;
-  final LoggedUser user;
+  final String message;
+  final String token;
+  final String expiresAt;
 
   VerifyCodeResponse({
     required this.ok,
-    required this.user,
+    required this.message,
+    required this.token,
+    required this.expiresAt,
   });
 
   factory VerifyCodeResponse.fromJson(Map<String, dynamic> json) {
-
-    final userJson = json["user"];
-
     return VerifyCodeResponse(
       ok: json["ok"],
-      user: LoggedUser(
-        id: userJson["id"],
-        name: userJson["nome"],
-        email: userJson["email"],
-        token: "",
-        refreshToken: "",
-      ),
+      message: json["message"],
+      token: json["token"],
+      expiresAt: json["expires_at"],
     );
   }
 }
