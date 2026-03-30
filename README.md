@@ -19,72 +19,57 @@ Rodando o backend
 
 Clone o repositório:
 
-git clone <repo-url>
-cd camus_app/server
-
+```bash
+git clone https://github.com/0xRibeiro/Projeto-Camus
+cd Projeto-Camus/camus_server
+```
 Crie e ative o ambiente virtual:
 
+```bash
 python -m venv venv
 source venv/bin/activate  # Linux/macOS
 venv\Scripts\activate     # Windows
+```
 
-Instale as dependências:
 
-pip install -r requirements.txt
+Crie e configure o arquivo .env com suas credenciais seguindo o .env.example
 
-Configure o arquivo .env com suas credenciais:
-
-JWT_SECRET=<seu_jwt_secret>
-EMAIL_REMETENTE=<seu_email>
-EMAIL_SENHA=<senha_email>
-JWT_ALGORITHM=HS256
-JWT_EXPIRE_DAYS=7
-
-Inicialize o banco de dados:
-
-from database.db import criar_conexao, inicializar_banco
-conexao = criar_conexao()
-inicializar_banco(conexao)
-conexao.close()
 
 Rode o servidor:
-
+```python
 python app.py
-
+```
 O servidor ficará disponível em http://127.0.0.1:5000.
 
 Rodando o app Flutter
 
 Conecte seu celular via USB e habilite a depuração. Verifique a conexão:
-
+```bash
 adb devices
-
+```
 Mapeie a porta para comunicar com o backend local:
-
+```bash
 adb reverse tcp:5000 tcp:5000
-
+```
 Entre na pasta do app Flutter e rode:
-
+```bash
 cd camus_app
-flutter pub get
 flutter run
-
+```
 O app se conectará ao backend rodando localmente no computador e você poderá testar cadastro, login com 2FA e recuperação de senha.
 
 Estrutura resumida
 
-server/: backend Flask, endpoints de autenticação, 2FA e recuperação de senha.
+camus_server/: backend Flask, endpoints de autenticação, 2FA e recuperação de senha.
 
 camus_app/: frontend Flutter com telas de login, cadastro, recuperação e redefinição de senha.
 
-database/: scripts para criação de tabelas users, auth_codes e sessions.
-
-service/ e repository/: organização do código de envio de e-mail, hashing, token JWT e persistência.
+camus_firmware/: firmware do ESP32 que vai rodar o projeto IoT
 
 
 Notas
 
-O sistema usa JWT para sessões com expiração curta (15 min para access token) e refresh token de 7 dias.
+O sistema usa JWT para sessões com expiração curta e refresh token de 7 dias.
 
 2FA e recuperação de senha usam códigos temporários enviados por e-mail.
 
