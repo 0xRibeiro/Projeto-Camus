@@ -1,4 +1,3 @@
-import 'package:camus_app/domain/entities/user_entity.dart';
 
 class VerifyCodeResponse {
   final bool ok;
