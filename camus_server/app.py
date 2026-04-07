@@ -632,4 +632,4 @@ if __name__ == "__main__":
         raise RuntimeError("Nao foi possivel inicializar o banco MySQL")
 
     # 1.8 Evidência funcional: execução local do servidor com logs
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=('cert.pem', 'key.pem'))
