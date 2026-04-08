@@ -1,3 +1,6 @@
+## Essa classe cria a sessão autenticada do usuário e tem as mesmas
+## proteções de segurança da recovery session, como expiração e invalidação.
+
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional

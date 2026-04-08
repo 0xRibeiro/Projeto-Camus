@@ -1,3 +1,8 @@
+## Cria o modelo do usuário no sistema, com os campos necessários
+## para seu cadastro e um id de autenticação. Futuramente podemos
+## ampliar esse modelo quando o sistema tiver mais funcionalidades.
+## Por enquanto ele será simples.
+
 from dataclasses import dataclass
 from typing import Optional
 
