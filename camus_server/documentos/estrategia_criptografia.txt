@@ -1,0 +1,35 @@
+Estrategia de Criptografia (Resumo)
+
+Objetivo
+Proteger credenciais, tokens e dados sensiveis em transito e em repouso, reduzindo risco de vazamento, forca bruta e uso indevido de sessao.
+
+1. Dados em transito
+- Todo acesso externo deve ocorrer via HTTPS.
+- Conexoes HTTP nao seguras sao bloqueadas pela API.
+
+2. Senhas
+- Senhas nao sao armazenadas em texto puro.
+- E utilizado bcrypt com fator de custo 12.
+- O salt e unico por senha e gerado automaticamente.
+
+3. Tokens e sessao
+- JWT assinado com segredo forte em variavel de ambiente.
+- Tokens possuem expiracao e identificador unico (jti).
+- Sessoes podem ser invalidadas no logout e na troca de senha.
+- Token de recuperacao possui escopo proprio e curta validade.
+
+4. Segredos
+- Segredos (ex.: JWT_SECRET) nao ficam no codigo-fonte.
+- Cada ambiente usa segredo proprio.
+- Deve haver rotacao periodica e imediata em caso de incidente.
+
+5. Controles adicionais
+- Rate limit em endpoints criticos (login, cadastro, 2FA e recuperacao).
+- Logs sem expor senha, token completo ou chaves.
+- Mensagens de erro genericas para evitar enumeracao de usuarios.
+
+Conclusao
+A estrategia combina HTTPS, hash forte de senha, controle de sessao
+e boa gestao de segredos para atender ao requisito de seguranca
+criptografica do sistema.
+

@@ -22,3 +22,8 @@ build/
 # Arquivos do sistema operacional
 .DS_Store
 Thumbs.db
+
+# Arquivos de certificado SSL
+cert.pem
+key.pem
+*.pem

@@ -1,5 +1,6 @@
 import logging
 import random
+import os
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
@@ -46,6 +47,16 @@ limiter = Limiter(
 )
 
 ERRO = {"error": "Erro interno ao processar a solicitacao"}
+
+
+# Garante o bloqueio de conexões não seguras HTTP
+@app.before_request
+def bloquear_conexao_nao_segura():
+    if os.getenv("REQUIRE_HTTPS", "true").lower() != "true":
+        return None
+
+    app.logger.warning("conexao_nao_segura_bloqueada")
+    return jsonify({"error": "Conexao nao segura bloqueada. Use HTTPS."}), 403
 
 
 @app.errorhandler(429)
@@ -639,4 +650,4 @@ if __name__ == "__main__":
         raise RuntimeError("Nao foi possivel inicializar o banco MySQL")
 
     # 1.8 Evidência funcional: execução local do servidor com logs
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=('cert.pem', 'key.pem'))
