@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../home_viewmodel.dart';
+import '../alterar_senha_page.dart';
 import 'package:camus_app/ui/auth/login_page.dart';
 
 class PerfilTab extends StatelessWidget {
@@ -97,7 +98,16 @@ class PerfilTab extends StatelessWidget {
                     _buildSectionHeader('Conta'),
                     const SizedBox(height: 8),
                     _buildSettingsTile(Icons.person_outline, 'Editar perfil', () {}),
-                    _buildSettingsTile(Icons.lock_outline, 'Alterar senha', () {}),
+                    _buildSettingsTile(Icons.lock_outline, 'Alterar senha', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AlterarSenhaPage(
+                            email: viewModel.user?.email ?? '',
+                          ),
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 24),
                     _buildSectionHeader('App'),
                     const SizedBox(height: 8),
