@@ -32,6 +32,13 @@ load_dotenv()
 
 app = Flask(__name__)
 
+
+#  3.3 evidencia de trafego cifrado
+@app.before_request
+def log_https_status():
+    is_secure = request.is_secure
+    app.logger.info(f"request_https method={request.method} path={request.path} secure={is_secure}")
+
 # 1.11 Proteção contra força bruta implementada com rate limit por IP
 limiter = Limiter(
     key_func=get_remote_address,

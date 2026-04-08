@@ -7,6 +7,10 @@ import 'package:camus_app/data/services/auth/client_http.dart';
 import 'package:camus_app/data/services/local_storage.dart';
 import 'package:camus_app/ui/home/home_viewmodel.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+String HTTPS_SERVER_URL = dotenv.env['HTTPS_SERVER_URL'] ?? 'URL não encontrada';
+
 
 final injector = AutoInjector();
 
@@ -26,11 +30,11 @@ void setupDependencies() {
   injector.addSingleton(HomeViewModel.new);
 
 
-  // http server
+  // https server
   injector.addSingleton(
   () => Dio(
     BaseOptions(
-      baseUrl: "http://127.0.0.1:5000",
+      baseUrl: HTTPS_SERVER_URL,
     ),
   ),
 );
