@@ -39,5 +39,5 @@ void setupDependencies() {
   ),
 );
 
-
+  injector.commit();
 }
