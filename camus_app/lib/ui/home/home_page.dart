@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:camus_app/config/dependencies.dart';
 import 'package:camus_app/ui/home/home_viewmodel.dart';
-import 'widgets/logout_button.dart';
-import 'widgets/user_card.dart';
-import 'package:camus_app/ui/auth/login_page.dart';
+import 'tabs/aquarios_tab.dart';
+import 'tabs/adicionar_tab.dart';
+import 'tabs/perfil_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeViewModel viewModel;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -34,33 +35,37 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = viewModel.user;
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            if (user != null)
-              UserCard(user: user)
-            else
-              const Text('Nenhum usuário carregado'),
-            const SizedBox(height: 16),
-            LogoutButton(
-              onPressed: () async {
-                await viewModel.logout();
-
-                if (!mounted) return;
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                );
-              },
-            ),
-          ],
-        ),
+      backgroundColor: const Color(0xFFF8F8F8),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          AquariosTab(viewModel: viewModel),
+          const AdicionarTab(),
+          PerfilTab(viewModel: viewModel),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        backgroundColor: const Color(0xFF003459),
+        selectedItemColor: const Color(0xFFFF9800),
+        unselectedItemColor: Colors.white70,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.water),
+            label: 'Aquários',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle),
+            label: 'Adicionar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
       ),
     );
   }
