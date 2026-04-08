@@ -1,6 +1,13 @@
+## Arquivo responsável por criar a conexão com o banco de dados,
+## utilizando as variáveis de ambiente do .env.
+## A conexão é feita com o driver do mysql e as tabelas são criadas
+## caso ainda não existam no banco. Há tratamento de erros se
+## a conexão falhar.
+
 from mysql.connector import Error, connect
 from dotenv import load_dotenv
 import os 
+
 load_dotenv()
 
 
