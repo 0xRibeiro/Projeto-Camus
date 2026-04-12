@@ -1,11 +1,16 @@
+## Usado para realizar operações relacionadas às sessões de recuperação de senha,
+## como criar, buscar e invalidar sessoes de recuperação no banco de dados.
+
 from model.recovery_session import RecoverySession
 
 
 class RecoverySessionRepository:
 
+    ## Inicia a conexão com o banco de dados
     def __init__(self, conexao):
         self.conexao = conexao
 
+    ## Cria uma nova sessão
     def criar(self, sessao: RecoverySession) -> RecoverySession:
         with self.conexao.cursor() as cursor:
             cursor.execute(
@@ -24,6 +29,7 @@ class RecoverySessionRepository:
             sessao.id = cursor.lastrowid
         return sessao
 
+    ## Busca uma sessão ativa (não invalidada e não expirada) pelo JTI do token
     def buscar_ativa_por_jti(self, token_jti: str):
         with self.conexao.cursor(dictionary=True) as cursor:
             cursor.execute(
@@ -38,6 +44,7 @@ class RecoverySessionRepository:
             )
             return cursor.fetchone()
 
+    ## Invalida uma sessão através de seu Token JTI.
     def invalidar_por_jti(self, token_jti: str):
         with self.conexao.cursor() as cursor:
             cursor.execute(
@@ -50,6 +57,7 @@ class RecoverySessionRepository:
             )
             self.conexao.commit()
 
+    ## Invalida todas as sessões de recuperação de um usuário específico.
     def invalidar_todas_por_usuario(self, user_id: int):
         with self.conexao.cursor() as cursor:
             cursor.execute(

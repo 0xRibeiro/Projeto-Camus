@@ -1,8 +1,11 @@
+## Realiza operações relacionadas as sessoões autenticadas do usuário.
+
 from model.session import Session
 
 
 class SessionRepository:
 
+    ## Conexão com o banco
     def __init__(self, conexao):
         self.conexao = conexao
 
@@ -53,6 +56,8 @@ class SessionRepository:
             )
             self.conexao.commit()
 
+    ## Invalida todas as sessões de um usuário, por exemplo, após
+    ## uma troca de senha ou suspeita de acesso não autorizado.
     def invalidar_todas_por_usuario(self, user_id: int):
         with self.conexao.cursor() as cursor:
             cursor.execute(

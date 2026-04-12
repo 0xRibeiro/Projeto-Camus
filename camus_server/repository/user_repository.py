@@ -1,9 +1,15 @@
+## Realiza as operações do do usuário no banco de dados,
+## como cadastrar, buscar e atualizar senha.
+
 from model.user import Usuario
 
 
 class RepositorioUsuario:
+    ## Conexão com o bd
     def __init__(self, conexao):
         self.conexao = conexao
+
+    ## Esse bloco de código possui metódos que compoem o CRUD do usuário.
 
     def cadastrar(self, usuario: Usuario) -> Usuario:
         with self.conexao.cursor() as cursor:
@@ -23,7 +29,7 @@ class RepositorioUsuario:
                 Usuario(id=row[0], nome=row[1], email=row[2], senha=row[3])
                 for row in cursor.fetchall()
             ]
-
+    
     def buscar_por_email(self, email: str) -> Usuario | None:
         with self.conexao.cursor() as cursor:
             cursor.execute(
