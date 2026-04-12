@@ -1,3 +1,6 @@
+## Lida com a geração dos tokens utilizados no sistema. Atualmente existem
+## tokens de autenticação e recuperação de senha, ambos com expiração configurada
+
 import os
 import uuid
 import jwt
@@ -16,6 +19,7 @@ def gerar_token(user_id: int):
     agora = datetime.now(timezone.utc)
     expira_em = agora + timedelta(days=JWT_EXPIRE_DAYS)
 
+    ## uuid usado para identificar o token.
     token_jti = str(uuid.uuid4())
 
     payload = {
@@ -59,6 +63,7 @@ def gerar_token_recuperacao(user_id: int):
     }
 
 
+## A validação acontece verificando a assinatura do token, a expiração e os campos obrigatórios.
 def validar_token(token: str):
 
     return jwt.decode(

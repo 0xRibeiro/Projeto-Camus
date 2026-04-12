@@ -1,9 +1,13 @@
+## Responsável por enviar o código de verificação 2FA por email usando o protocolo SMTP
+## No futuro poderemos expandir e criar o metódo do sms para aumentar as opções de 2FA 
+
+
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 
-
+## Variaveis do env carregadas.
 EMAIL_REMETENTE = os.getenv("EMAIL_REMETENTE")
 EMAIL_SENHA = os.getenv("EMAIL_SENHA")
 SMTP_SERVIDOR = "smtp.gmail.com"
@@ -12,6 +16,7 @@ SMTP_PORTA = 587
 
 def enviar_codigo(email_destino, codigo):
 
+    ## Gera o email utilizando a biblioteca email.mime
     mensagem = MIMEMultipart()
 
     mensagem["From"] = EMAIL_REMETENTE
