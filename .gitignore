@@ -1,3 +1,8 @@
+## Aqui ficam as pastas e arquivos ignoradas pelo git, para garantir que dados sensíveis e/ou
+## desnessários acabem indo para os repositórios. No nosso caso por enquanto
+## ignoramos os arquivos de logs, os caches do python, as builds do flutter, os certificados ssl,
+## os arquivos do vscode e os arquivos de ambiente virtual.
+
 # Python
 __pycache__/
 *.pyc
