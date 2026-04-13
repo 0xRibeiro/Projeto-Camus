@@ -86,5 +86,8 @@ def inicializar_banco(conexao):
         cursor.execute(tabela_auth_codes)
         cursor.execute(tabela_sessions)
         cursor.execute(tabela_recovery_sessions)
+        cursor.execute(
+            "ALTER TABLE auth_codes MODIFY COLUMN codigo VARCHAR(500) NOT NULL"
+        )
 
     conexao.commit()

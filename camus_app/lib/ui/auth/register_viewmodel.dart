@@ -44,7 +44,7 @@ class RegisterViewModel {
     isLoading.value = false;
 
     return result.fold((success) => success.challengeId, (error) {
-      errorMessage.value = error.toString();
+      errorMessage.value = "Erro ao cadastrar. Tente novamente.";
       return null;
     });
   }

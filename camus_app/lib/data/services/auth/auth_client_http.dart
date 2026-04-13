@@ -76,4 +76,34 @@ class AuthClientHttp {
 
     return response.map((_) => unit);
   }
+
+  AsyncResult<int> solicitarRecuperacao(String email) async {
+    final response = await _clientHttp.post('/recuperar-senha', {'email': email});
+
+    return response.map((response) {
+      final httpResponse = response as Response;
+      return httpResponse.data['challenge_id'] as int;
+    });
+  }
+
+  AsyncResult<String> verificarCodigoRecuperacao(int challengeId, String codigo) async {
+    final response = await _clientHttp.post('/verificar-codigo-recuperacao', {
+      'challenge_id': challengeId,
+      'codigo': codigo,
+    });
+
+    return response.map((response) {
+      final httpResponse = response as Response;
+      return httpResponse.data['token'] as String;
+    });
+  }
+
+  AsyncResult<Unit> redefinirSenha(String token, String novaSenha) async {
+    final response = await _clientHttp.post('/redefinir-senha', {
+      'token': token,
+      'nova_senha': novaSenha,
+    });
+
+    return response.map((_) => unit);
+  }
 }
