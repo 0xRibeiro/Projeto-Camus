@@ -1,33 +1,119 @@
 Resumo de como foi feito cada um dos requisitos até o momento:
 1 -- Autenticação e Gestão de Credenciais
 1.01 - Uso de hash criptográfico seguro para senhas  (Argon2, bcrypt ou PBKDF2)
+Como foi feito: Hash com bcrypt em security.py:43-49, usado no cadastro em app.py:192-201
+e na redefinicao em app.py:558-559.
+
 1.02 - Parâmetros de custo do hash configurados e justificados
+Como foi feito: Fator de custo configurado em security.py:17 e justificado em
+security.py:20-22.
+
 1.03 - Uso de salt criptográfico único por usuário
+Como foi feito: Salt unico por senha com bcrypt.gensalt(rounds=COST_FACTOR)
+em security.py:47.
+
 1.04 - Armazenamento correto do hash + salt 
+Como foi feito: Hash bcrypt (que ja contem salt) salvo na coluna senha em 
+repository/user_repository.py:16-20, vindo de app.py:195-201.
+
 1.05 - Autenticação de dois fatores (2FA)implementada
+Como foi feito: Gera codigo 2FA no cadastro em app.py:206-220 e no login 
+em app.py:274-289, persistindo em repository/auth_code_repository.py:16-37.
+
 1.06 - Validação do 2FA após autenticação primária
+Como foi feito: Validacao do challenge/codigo em app.py:331-340 com consulta
+em repository/auth_code_repository.py:40-60 e marcacao de uso em 
+repository/auth_code_repository.py:63-77.
+
 1.07 - Fluxo de autenticação documentado 
+Como foi feito: Fluxo completo documentado em documentos/fluxo.txt:1-167.
+
 1.08 - Evidências funcionais (prints, logs ou testes)
+Como foi feito: Evidencia por testes em testes/teste.py:42-102 e logs 
+operacionais em app.py:222, app.py:290, app.py:362, app.py:480, 
+app.py:572, app.py:639, app.py:670.
+
 1.09 - Sessões com tempo de expiração 
+Como foi feito: Expiracao no JWT em service/token_service.py:19-33, 
+sessao com expira_em em app.py:349-358 e validacao de sessao 
+ativa/nao expirada em repository/session_repository.py:31-44.
+
 1.10 - Invalidação de sessão no logout 
+Como foi feito: Logout invalida a sessao por jti em app.py:635-637, 
+implementado em repository/session_repository.py:46-57.
+
 1.11 - Proteção contra força bruta (rate limit, bloqueio, atraso)
+Como foi feito: Flask-Limiter por IP em app.py:42-47, limites em 
+app.py:175, app.py:245, app.py:310, app.py:383, app.py:432, 
+app.py:501 e resposta 429 em app.py:70-72.
+
 1.12 - Justificativas técnicas documentadas 
+Como foi feito: Justificativas em documentos/justificativa.txt:1-181 
+e estrategia complementar em documentos/estrategia_criptografia.txt:1-34.
 
 2 -- Recuperação de Senha 
 2.01 - Funcionalidade de recuperação de senha implementada 
+Como foi feito: Fluxo com /recuperar-senha em app.py:431-486, 
+/verificar-codigo-recuperacao em app.py:382-422 e 
+/redefinir-senha em app.py:500-577.
+
 2.02 - Token criptograficamente seguro
+Como foi feito: Token de recuperacao JWT assinado com 
+segredo/algoritmo em service/token_service.py:12-14 e 
+service/token_service.py:43-63, validado em app.py:519-535.
+
 2.03 - Token com tempo de expiração
+Como foi feito: Expiracao de 15 minutos em 
+service/token_service.py:45-55 e rejeicao por 
+expiracao em app.py:530-532.
+
 2.04 - Token invalidado após uso 
+Como foi feito: Invalidacao por jti e invalidacao 
+total por usuario em app.py:561-566 e 
+repository/recovery_session_repository.py:47-71.
+
 2.05 - Falha correta para token expirado
+Como foi feito: Tratamento de jwt.ExpiredSignatureError 
+retornando 401 em app.py:530-532.
+
 2.06 - Registro de solicitação de recuperação em log 
+Como foi feito: Log de solicitacao em app.py:438-439 
+e app.py:508-509.
+
 2.07 - Registro de sucesso/falha do processo 
+Como foi feito: Logs de sucesso/falha em app.py:361-374, 
+app.py:479-490 e app.py:572-580.
 
 3 -- Criptografia e Comunicação Segura 
 3.01 - Comunicação protegida por TLS/HTTPS 
+Como foi feito: Servidor com ssl_context em app.py:687 
+e script de geracao de certificado em ssl.sh:4-5.
+
 3.02 - Bloqueio de conexões não seguras 
+Como foi feito: Middleware before_request bloqueando 
+HTTP inseguro em app.py:54-67.
+
 3.03 - Evidência de tráfego cifrado 
+Como foi feito: Registro por requisicao com 
+flag secure no log em app.py:35-40.
+
 3.04 - Dados sensíveis criptografados em repouso
+Como foi feito: Codigo de 2FA/recuperacao é criptografado 
+antes de persistir em repository/auth_code_repository.py:16-33 
+usando security.py:65-68, e a coluna de armazenamento foi 
+ajustada para ciphertext em database/db.py:51 e database/db.py:89.
+
 3.05 - Uso de algoritmo criptográfico adequado (ex.:AES)
+Como foi feito: Uso de Fernet (baseado em AES) para criptografar 
+e descriptografar os codigos sensiveis em security.py:29-39, 
+security.py:65-74 e no fluxo de validacao em repository/auth_code_repository.py:63-72.
+
 3.06 - Chaves criptográficas protegidas
+Como foi feito: Chaves carregadas por variavel de ambiente em 
+security.py:24-27 e service/token_service.py:12-14.
+
 3.07 - Estratégia de criptografia documentada
-3.08 - Justificativa técnica das escolhas 
+Como foi feito: Estrategia documentada em documentos/estrategia_criptografia.txt:1-34.
+
+3.08 - Justificativa técnica das escolhas
+Como foi feito: Justificativas tecnicas em documentos/justificativa.txt:5-181.
