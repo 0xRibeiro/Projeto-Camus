@@ -1,0 +1,33 @@
+Resumo de como foi feito cada um dos requisitos até o momento:
+1 -- Autenticação e Gestão de Credenciais
+1.01 - Uso de hash criptográfico seguro para senhas  (Argon2, bcrypt ou PBKDF2)
+1.02 - Parâmetros de custo do hash configurados e justificados
+1.03 - Uso de salt criptográfico único por usuário
+1.04 - Armazenamento correto do hash + salt 
+1.05 - Autenticação de dois fatores (2FA)implementada
+1.06 - Validação do 2FA após autenticação primária
+1.07 - Fluxo de autenticação documentado 
+1.08 - Evidências funcionais (prints, logs ou testes)
+1.09 - Sessões com tempo de expiração 
+1.10 - Invalidação de sessão no logout 
+1.11 - Proteção contra força bruta (rate limit, bloqueio, atraso)
+1.12 - Justificativas técnicas documentadas 
+
+2 -- Recuperação de Senha 
+2.01 - Funcionalidade de recuperação de senha implementada 
+2.02 - Token criptograficamente seguro
+2.03 - Token com tempo de expiração
+2.04 - Token invalidado após uso 
+2.05 - Falha correta para token expirado
+2.06 - Registro de solicitação de recuperação em log 
+2.07 - Registro de sucesso/falha do processo 
+
+3 -- Criptografia e Comunicação Segura 
+3.01 - Comunicação protegida por TLS/HTTPS 
+3.02 - Bloqueio de conexões não seguras 
+3.03 - Evidência de tráfego cifrado 
+3.04 - Dados sensíveis criptografados em repouso
+3.05 - Uso de algoritmo criptográfico adequado (ex.:AES)
+3.06 - Chaves criptográficas protegidas
+3.07 - Estratégia de criptografia documentada
+3.08 - Justificativa técnica das escolhas 
