@@ -1,29 +1,28 @@
+## os imports necessários consistem em bibliotecas do flask, arquivos do própprio projeto e
+## módulos para segurança, email e tokens. Também tem o dotenv para as váriaveis de ambiente,
+## os imports de logging para configurar os logs do servidor e outros usados para randomização e 
+## manipulação de dados.
+
 import logging
 import random
 import os
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
-
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import jwt
-
 from database.db import criar_conexao, inicializar_banco
 from model.user import Usuario
 from repository.user_repository import RepositorioUsuario
 from security import gerar_hash_senha, verificar_senha
-
 from model.auth_code import AuthCode
 from repository.auth_code_repository import AuthCodeRepository
 from service.email_service import enviar_codigo
-
 from model.session import Session
 from repository.session_repository import SessionRepository
-from service.token_service import gerar_token, validar_token
-
 from model.recovery_session import RecoverySession
 from repository.recovery_session_repository import RecoverySessionRepository
 from service.token_service import gerar_token, validar_token, gerar_token_recuperacao
@@ -37,6 +36,7 @@ app = Flask(__name__)
 @app.before_request
 def log_https_status():
     is_secure = request.is_secure
+    ## Exemplo na linha 40 de como o sistema registra seus logs.
     app.logger.info(f"request_https method={request.method} path={request.path} secure={is_secure}")
 
 # 1.11 Proteção contra força bruta implementada com rate limit por IP
@@ -52,7 +52,15 @@ ERRO = {"error": "Erro interno ao processar a solicitacao"}
 # Garante o bloqueio de conexões não seguras HTTP
 @app.before_request
 def bloquear_conexao_nao_segura():
-    if os.getenv("REQUIRE_HTTPS", "true").lower() != "true":
+    if os.getenv("REQUIRE_HTTPS", "true").strip().lower() != "true":
+        return None
+
+    forwarded_proto = request.headers.get("X-Forwarded-Proto", "")
+    forwarded_proto = forwarded_proto.split(",")[0].strip().lower()
+    forwarded = request.headers.get("Forwarded", "").lower()
+    conexao_segura = request.is_secure or forwarded_proto == "https" or "proto=https" in forwarded
+
+    if conexao_segura:
         return None
 
     app.logger.warning("conexao_nao_segura_bloqueada")
@@ -64,6 +72,9 @@ def tratar_rate_limit(_erro):
     return jsonify({"error": "Muitas tentativas. Tente novamente em instantes"}), 429
 
 
+## Aqui é configurado para onde vão os logs, o seu tamanho máximo e seu formato.
+## Quando o arquivo atingir o limite de tamanhoum novo arquivo de log é criado
+## com seu nome tendo um numero sequencial. exemplo: camus_server.log.1, camus_server.log.2, etc.
 def configurar_logs():
     pasta_logs = Path(__file__).resolve().parent / "logs"
     pasta_logs.mkdir(parents=True, exist_ok=True)
@@ -86,8 +97,8 @@ def configurar_logs():
 configurar_logs()
 
 
+## funcão do banco de dados.
 def preparar_banco():
-
     conexao = criar_conexao()
 
     if not conexao:
@@ -97,14 +108,13 @@ def preparar_banco():
     try:
         inicializar_banco(conexao)
         app.logger.info("banco_inicializacao_sucesso")
+        conexao.close()
         return True
 
     except Exception:
         app.logger.exception("banco_inicializacao_falha")
-        return False
-
-    finally:
         conexao.close()
+        return False
 
 
 # Extrai o token Bearer do header Authorization
@@ -157,6 +167,9 @@ def autenticar_requisicao(conexao):
     }, None
 
 
+
+## rota padrão da criacão de usuário, onde é feita a validação dos dados,
+## a criação do hash da senha e o cadastro do usuário no banco,
 @app.post("/cadastrar")
 # 1.11 Limite de tentativas no cadastro
 @limiter.limit("5 per minute")
@@ -222,6 +235,11 @@ def cadastrar_usuario():
         conexao.close()
 
 
+## rota do login, onde é feita a validação dos dados do usuário tentando
+## logar. A verificação da senha é feita usando o hash seguro. Caso bata,
+## é gerado o código de 2FA, salvo no banco e enviado para o email do usuário.
+## Quando o usuário autentica com sucesso, a sessão dele é criada e tem uma duração de
+## cerca de 7 dias.
 @app.post("/login")
 # 1.11 Limite de tentativas no login
 @limiter.limit("5 per minute")
@@ -285,6 +303,8 @@ def login():
         conexao.close()
 
 
+## verifica se o código 2FA é valido, checando principalmente se ele existe no
+## banco e se ainda é válido.
 @app.post("/verificar-codigo")
 # 1.11 Limite de tentativas no 2FA
 @limiter.limit("10 per minute")
@@ -356,7 +376,9 @@ def verificar_codigo():
     finally:
         conexao.close()
         
-        
+
+## muito parecido com o anteiror, com a diferença de esse aqui ser 
+## usado para o código de recuperação de senha, que tem um tipo diferente e uma expiração mais curta.
 @app.post("/verificar-codigo-recuperacao")
 @limiter.limit("5 per minute")
 def verificar_codigo_recuperacao():
@@ -403,6 +425,9 @@ def verificar_codigo_recuperacao():
         conexao.close()
 
 
+## A rota principal do processo de recuperação de senha,
+## com o usuário tendo que digitar seu email, receber um código temporário
+## e por fim utilizar esse código para ser capaz de redefinir sua senha.
 @app.post("/recuperar-senha")
 @limiter.limit("5 per minute")
 def solicitar_recuperacao_senha():
@@ -468,6 +493,10 @@ def solicitar_recuperacao_senha():
     finally:
         conexao.close()
 
+## Após passar pelas checagens das rotas anteriores, essa
+## rota é responsável por de fato redefinir a senha do usuário e expirar os tokens usados.
+## Ela também inválida a sessão do usuário mesmo não tendo passado os 7 dias,
+## para garantir a segurança da conta e principalmente sua integridade.
 @app.post("/redefinir-senha")
 @limiter.limit("5 per minute")
 def redefinir_senha():
@@ -554,6 +583,8 @@ def redefinir_senha():
     finally:
         conexao.close()
 
+
+## um exemplo de rota protegida, sendo acessada apenas se estiver em uma sessão autenticada.
 @app.get("/me")
 def me():
 
@@ -584,6 +615,7 @@ def me():
         conexao.close()
 
 
+## Faz o logout e principalmente inválida a sessão atual.
 @app.post("/logout")
 def logout():
 
@@ -619,6 +651,8 @@ def logout():
         conexao.close()
 
 
+## rota comum do crud que consiste em listar os usuários cadastrados,
+## utilizada principalmente para testes
 @app.get("/usuarios")
 def listar_usuarios():
 
