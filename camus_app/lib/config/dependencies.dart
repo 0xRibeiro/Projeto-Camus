@@ -9,7 +9,7 @@ import 'package:camus_app/ui/home/home_viewmodel.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-String HTTPS_SERVER_URL = dotenv.env['HTTPS_SERVER_URL'] ?? 'URL não encontrada';
+String get HTTPS_SERVER_URL => dotenv.env['HTTPS_SERVER_URL'] ?? 'URL não encontrada';
 
 
 final injector = AutoInjector();

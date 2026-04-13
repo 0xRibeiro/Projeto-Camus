@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:camus_app/config/dependencies.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:routefly/routefly.dart';
 
 import 'main.route.dart';
 part 'main.g.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   setupDependencies();
-  runApp(CamusApp());
+  runApp(const CamusApp());
 }
 
 @Main('lib/ui/')
