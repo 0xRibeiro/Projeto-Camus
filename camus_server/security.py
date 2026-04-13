@@ -1,3 +1,8 @@
+## Esse arquivo cria a lógica de segurança do sistema, principalmente 
+## a parte de hash e criptografia, utilizando as bibliotecas bcrypt e o fernet da cryptography.
+## O bcryp cria os hashs das senhas e dados semelhantes enquanto o fernet criptografa coisas como
+## os códigos de 2FA e recuperação de senha.
+
 import bcrypt
 from cryptography.fernet import Fernet
 import os
