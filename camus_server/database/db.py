@@ -48,7 +48,7 @@ def inicializar_banco(conexao):
     CREATE TABLE IF NOT EXISTS auth_codes (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        codigo VARCHAR(6) NOT NULL,
+        codigo VARCHAR(255) NOT NULL,
         tipo VARCHAR(20) NOT NULL,
         expira_em DATETIME NOT NULL,
         usado BOOLEAN DEFAULT FALSE,
