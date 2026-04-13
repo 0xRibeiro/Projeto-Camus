@@ -2,8 +2,8 @@
 ## como insere-los no banco de dados, buscar códigos válidos e marcar códigos
 ## já usados.
 
-from datetime import datetime
 from model.auth_code import AuthCode
+from security import criptografar_dado, descriptografar_dado
 
 
 class AuthCodeRepository:
@@ -14,6 +14,7 @@ class AuthCodeRepository:
 
     # Insere um novo código de autenticação no banco de dados
     def criar(self, auth_code: AuthCode):
+        codigo_criptografado = criptografar_dado(auth_code.codigo)
 
         with self.conexao.cursor() as cursor:
 
@@ -25,7 +26,7 @@ class AuthCodeRepository:
                 """,
                 (
                     auth_code.user_id,
-                    auth_code.codigo,
+                    codigo_criptografado,
                     auth_code.tipo,
                     auth_code.expira_em,
                 ),
@@ -43,21 +44,29 @@ class AuthCodeRepository:
 
             # Seleciona o código de autenticação se:
             # - ID corresponde (challenge_id)
-            # - Código corresponde ao enviado
             # - Ainda não foi usado (usado=FALSE)
             # - Ainda não expirou (expira_em >= NOW())
             cursor.execute(
                 """
                 SELECT * FROM auth_codes
                 WHERE id=%s
-                AND codigo=%s
                 AND usado=FALSE
                 AND expira_em >= NOW()
                 """,
-                (challenge_id, codigo),
+                (challenge_id,),
             )
+            resultado = cursor.fetchone()
 
-            return cursor.fetchone()
+            if not resultado:
+                return None
+
+            codigo_salvo = resultado.get("codigo")
+            codigo_salvo = descriptografar_dado(codigo_salvo)
+
+            if codigo_salvo != codigo:
+                return None
+
+            return resultado
 
     # Marca um código de autenticação como já utilizado
     def marcar_usado(self, challenge_id):
