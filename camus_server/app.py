@@ -684,6 +684,11 @@ def listar_usuarios():
         conexao.close()
 
 
+@app.get("/healthz")
+def healthz():
+    return jsonify({"ok": True}), 200
+
+
 if __name__ == "__main__":
 
     if not preparar_banco():
