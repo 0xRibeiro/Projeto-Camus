@@ -19,6 +19,7 @@ __pycache__/
 build/
 .dart_tool/
 .packages
+devtools_options.yaml
 
 # IDE
 .vscode/

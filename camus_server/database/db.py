@@ -19,7 +19,7 @@ def criar_conexao():
         if url and url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
         conexao = psycopg2.connect(url)
-    except psycopg2.Error:
+    except Exception:
         return None
     return conexao
 
