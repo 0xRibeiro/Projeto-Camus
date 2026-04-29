@@ -35,6 +35,32 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    const debug = bool.fromEnvironment('DEBUG_ERRORS', defaultValue: false);
+    if (debug) {
+      viewModel.errorMessage.addListener(() {
+        final msg = viewModel.errorMessage.value;
+        if (msg != null && mounted) {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Erro (debug)'),
+              content: SingleChildScrollView(child: SelectableText(msg)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Fechar'),
+                ),
+              ],
+            ),
+          );
+        }
+      });
+    }
+  }
+
+  @override
   void dispose() {
     viewModel.dispose();
     super.dispose();

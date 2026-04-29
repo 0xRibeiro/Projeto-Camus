@@ -44,7 +44,10 @@ class RegisterViewModel {
     isLoading.value = false;
 
     return result.fold((success) => success.challengeId, (error) {
-      errorMessage.value = "Erro ao cadastrar. Tente novamente.";
+      const debug = bool.fromEnvironment('DEBUG_ERRORS', defaultValue: false);
+      errorMessage.value = debug
+          ? "Erro: ${error.toString()}"
+          : "Erro ao cadastrar. Tente novamente.";
       return null;
     });
   }
