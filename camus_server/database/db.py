@@ -79,3 +79,4 @@ def inicializar_banco(conexao):
         cursor.execute(tabela_recovery_sessions)
 
     conexao.commit()
+    
