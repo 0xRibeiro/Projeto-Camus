@@ -1,6 +1,7 @@
 ## Usado para realizar operações relacionadas às sessões de recuperação de senha,
 ## como criar, buscar e invalidar sessoes de recuperação no banco de dados.
 
+import psycopg2.extras
 from model.recovery_session import RecoverySession
 
 
@@ -16,7 +17,7 @@ class RecoverySessionRepository:
             cursor.execute(
                 """
                 INSERT INTO recovery_sessions (user_id, token_jti, expira_em, invalidada)
-                VALUES (%s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s) RETURNING id
                 """,
                 (
                     sessao.user_id,
@@ -26,12 +27,12 @@ class RecoverySessionRepository:
                 ),
             )
             self.conexao.commit()
-            sessao.id = cursor.lastrowid
+            sessao.id = cursor.fetchone()[0]
         return sessao
 
     ## Busca uma sessão ativa (não invalidada e não expirada) pelo JTI do token
     def buscar_ativa_por_jti(self, token_jti: str):
-        with self.conexao.cursor(dictionary=True) as cursor:
+        with self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
             cursor.execute(
                 """
                 SELECT * FROM recovery_sessions

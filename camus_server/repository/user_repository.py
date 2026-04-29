@@ -15,11 +15,11 @@ class RepositorioUsuario:
         with self.conexao.cursor() as cursor:
             # 1.4 Armazenamento do hash já gerado da senha
             cursor.execute(
-                "INSERT INTO users (nome, email, senha) VALUES (%s, %s, %s)",
+                "INSERT INTO users (nome, email, senha) VALUES (%s, %s, %s) RETURNING id",
                 (usuario.nome, usuario.email, usuario.senha),
             )
             self.conexao.commit()
-            usuario.id = cursor.lastrowid
+            usuario.id = cursor.fetchone()[0]
         return usuario
 
     def listar(self) -> list[Usuario]:
@@ -29,7 +29,7 @@ class RepositorioUsuario:
                 Usuario(id=row[0], nome=row[1], email=row[2], senha=row[3])
                 for row in cursor.fetchall()
             ]
-    
+
     def buscar_por_email(self, email: str) -> Usuario | None:
         with self.conexao.cursor() as cursor:
             cursor.execute(

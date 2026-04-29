@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import jwt
-from mysql.connector.errors import IntegrityError
+from psycopg2.errors import UniqueViolation
 from database.db import criar_conexao, inicializar_banco
 from model.user import Usuario
 from repository.user_repository import RepositorioUsuario
@@ -205,7 +205,7 @@ def cadastrar_usuario():
 
         try:
             usuario = repositorio_usuario.cadastrar(usuario)
-        except IntegrityError:
+        except UniqueViolation:
             app.logger.warning("cadastro_email_duplicado")
             return jsonify({"error": "Email ja cadastrado"}), 409
 

@@ -1,5 +1,6 @@
 ## Realiza operações relacionadas as sessoões autenticadas do usuário.
 
+import psycopg2.extras
 from model.session import Session
 
 
@@ -15,7 +16,7 @@ class SessionRepository:
             cursor.execute(
                 """
                 INSERT INTO sessions (user_id, token_jti, expira_em, invalidada)
-                VALUES (%s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s) RETURNING id
                 """,
                 (
                     sessao.user_id,
@@ -25,12 +26,12 @@ class SessionRepository:
                 ),
             )
             self.conexao.commit()
-            sessao.id = cursor.lastrowid
+            sessao.id = cursor.fetchone()[0]
         return sessao
 
     # 1.9 Sessão válida precisa estar ativa e dentro do prazo
     def buscar_ativa_por_jti(self, token_jti: str):
-        with self.conexao.cursor(dictionary=True) as cursor:
+        with self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
             cursor.execute(
                 """
                 SELECT * FROM sessions

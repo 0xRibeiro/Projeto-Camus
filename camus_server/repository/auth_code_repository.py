@@ -2,6 +2,7 @@
 ## como insere-los no banco de dados, buscar códigos válidos e marcar códigos
 ## já usados.
 
+import psycopg2.extras
 from model.auth_code import AuthCode
 from security import criptografar_dado, descriptografar_dado
 
@@ -22,7 +23,7 @@ class AuthCodeRepository:
             cursor.execute(
                 """
                 INSERT INTO auth_codes (user_id, codigo, tipo, expira_em)
-                VALUES (%s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s) RETURNING id
                 """,
                 (
                     auth_code.user_id,
@@ -33,14 +34,14 @@ class AuthCodeRepository:
             )
 
             self.conexao.commit()
-            auth_code.id = cursor.lastrowid
+            auth_code.id = cursor.fetchone()[0]
 
         return auth_code
 
     # Busca apenas códigos válidos, não usados e não expirados
     def buscar_valido(self, challenge_id, codigo):
 
-        with self.conexao.cursor(dictionary=True) as cursor:
+        with self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
 
             # Seleciona o código de autenticação se:
             # - ID corresponde (challenge_id)
