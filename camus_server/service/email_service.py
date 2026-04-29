@@ -1,6 +1,7 @@
 ## Responsável por enviar o código de verificação 2FA por email via Brevo API.
 ## Usa HTTP em vez de SMTP pois provedores cloud gratuitos bloqueiam conexões SMTP de saída.
 
+
 import os
 import requests
 
