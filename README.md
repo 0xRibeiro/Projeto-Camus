@@ -1,6 +1,5 @@
 # Camus App
 
-
 Aplicativo Flutter com backend em Flask para autenticação de usuários com 2FA via e-mail e recuperação de senha.
 
 Pré-requisitos
