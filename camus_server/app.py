@@ -33,7 +33,7 @@ load_dotenv()
 app = Flask(__name__)
 
 
-#  3.3 evidencia de trafego cifrado
+#  3.3 evidencia de trafego cifrado.
 @app.before_request
 def log_https_status():
     is_secure = request.is_secure
